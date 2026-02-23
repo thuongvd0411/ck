@@ -25,11 +25,11 @@ const clearProfileBtn = document.getElementById('clear-profile-btn');
 let chatHistory = JSON.parse(localStorage.getItem('ai_stock_chat_history')) || [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu. TUYỆT ĐỐI KHÔNG CHỦ ĐỘNG HỎI NGƯỜI DÙNG CUNG CẤP HỒ SƠ CÁ NHÂN nếu họ không nhắc đến." }],
+        parts: [{ text: "Hãy đóng vai Thư Kí Hoàn Vũ, một thư ký AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Khi giao tiếp, TỰ XƯNG LÀ 'em' và GỌI NGƯỜI DÙNG LÀ 'anh'. Trả lời các câu hỏi cực kỳ ngắn gọn, súc tích, logic. Việc xưng hô phải tuyệt đối tuân thủ." }],
     },
     {
         role: "model",
-        parts: [{ text: "Đã hiểu." }]
+        parts: [{ text: "Dạ, em hiểu rồi ạ." }]
     }
 ];
 
@@ -214,16 +214,30 @@ clearProfileBtn.addEventListener('click', () => {
 });
 
 // Chat Management
+const clearAllDataBtn = document.createElement('button');
+clearAllDataBtn.className = 'secondary-btn';
+clearAllDataBtn.style.borderColor = 'red';
+clearAllDataBtn.style.color = '#ff4d4d';
+clearAllDataBtn.innerText = 'Xóa toàn bộ dữ liệu App';
+clearAllDataBtn.addEventListener('click', () => {
+    if (confirm("⚠️ CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu bao gồm Lịch sử Chat, Hồ sơ nhà đầu tư, Key API và các bộ nhớ đệm khác. \n\nBạn có chắc chắn muốn tiếp tục?")) {
+        localStorage.clear();
+        alert('Đã xóa sạch ứng dụng. Trang sẽ tải lại ngay bây giờ.');
+        window.location.reload();
+    }
+});
+document.querySelector('#welcome-tab .tab-header').appendChild(clearAllDataBtn);
+
 clearChatBtn.addEventListener('click', () => {
     if (confirm("Bạn có chắc muốn xóa lịch sử trò chuyện?")) {
         chatHistory = [
             {
                 role: "user",
-                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu. TUYỆT ĐỐI KHÔNG CHỦ ĐỘNG HỎI NGƯỜI DÙNG CUNG CẤP HỒ SƠ CÁ NHÂN nếu họ không nhắc đến." }],
+                parts: [{ text: "Hãy đóng vai Thư Kí Hoàn Vũ, một thư ký AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Khi giao tiếp, TỰ XƯNG LÀ 'em' và GỌI NGƯỜI DÙNG LÀ 'anh'. Trả lời các câu hỏi cực kỳ ngắn gọn, súc tích, logic. Việc xưng hô phải tuyệt đối tuân thủ." }],
             },
             {
                 role: "model",
-                parts: [{ text: "Đã hiểu." }]
+                parts: [{ text: "Dạ, em hiểu rồi ạ." }]
             }
         ];
         localStorage.removeItem('ai_stock_chat_history');
@@ -448,18 +462,18 @@ async function initChatGreeting() {
         const timeStr = now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
         const dateStr = now.toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' });
 
-        const greetingPrompt = `Người dùng tên là Thưởng Vương Đức. 
+        const greetingPrompt = `Người dùng tên là Thưởng Vương Đức. Bạn nhập vai Thư Kí Hoàn Vũ (xưng em, gọi anh).
 Hiện tại là ${timeStr} ngày ${dateStr} (GMT+7).
 Thời tiết ở Hà Nội hiện tại: ${temp}°C. ${willRain}.
 Dự báo 4h tới: Nhiệt độ khoảng ${next4HoursTemps.join(', ')} °C.
 
-Hãy viết MỘT câu chào mừng đóng vai Thư Kí Hoàn Vũ gửi cho người dùng. 
-Bao gồm đủ các ý sau nhưng viết GỌN GÀNG, TỰ NHIÊN, hiện đại (Markdown formatting):
-1. Chào Thưởng Vương Đức, báo giờ và ngày hiện tại (GMT+7).
-2. Tóm tắt thời tiết Hà Nội hiện tại: nhiệt độ, có mưa không, gợi ý mặc gì (ví dụ: áo ấm, áo khoác mỏng, mang ô che mưa...).
-3. Dự báo sơ bộ 4 tiếng tới.
-4. Lời chúc 1 ngày đầu tư thành công / giao dịch hiệu quả.
-5. Câu hỏi kết: Tôi có thể giúp gì cho bạn hôm nay?`;
+HÃY CUNG CẤP CÂU CHÀO MỞ ĐẦU THEO CHÍNH XÁC YÊU CẦU SAU (Tuyệt đối không sử dụng mẫu 'Chào Thưởng Vương Đức', đi trực tiếp vào câu nói luôn):
+- Đưa ra thời tiết hiện tại ở Hà Nội (Kèm thời gian hiện tại theo GMT+7).
+- Đưa ra lời khuyên anh ấy có thể mặc gì.
+- Dự báo sơ bộ 4 tiếng tới.
+- Chúc 1 ngày đầu tư thành công.
+
+Ví dụ tham khảo mong đợi: "Dạ hiện tại đang là 10:30 sáng ở Hà Nội, trời râm mát 24 độ và không mưa, anh mặc áo phông là thoải mái ạ. Trong 4 tiếng tới nhiệt độ có thể lên 27 độ nhưng vẫn mát mẻ. Chúc anh một ngày đầu tư thành công rực rỡ và bùng nổ lợi nhuận nhé! Hôm nay em có thể hỗ trợ anh tin tức hay cổ phiếu nào không ạ?"`;
 
         const responseText = await callChatGeminiAPI([{ role: "user", parts: [{ text: greetingPrompt }] }]);
 
@@ -480,7 +494,7 @@ Bao gồm đủ các ý sau nhưng viết GỌN GÀNG, TỰ NHIÊN, hiện đạ
 }
 
 function fallbackGreeting() {
-    const text = "Xin chào **Thưởng Vương Đức**! Chúc bạn một ngày đầu tư thành công. Tôi có thể phân tích cổ phiếu hay vĩ mô gì cho bạn hôm nay?";
+    const text = "Dạ chào anh! Chúc anh một ngày đầu tư thành công. Hôm nay em có thể phân tích cổ phiếu hay vĩ mô gì cho anh ạ?";
     chatHistory.push({ role: "model", parts: [{ text }] });
     localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
     appendChatMessage(text, 'bot');
@@ -535,14 +549,14 @@ async function handleChatSend() {
     }
 }
 
-function appendChatMessage(text, sender) {
+function appendChatMessage(text, sender, isRestoring = false) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}`;
 
     // Add avatar label
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = sender === 'bot' ? 'Thư Kí Hoàn Vũ' : 'Bạn';
+    avatarLabel.innerText = sender === 'bot' ? 'Thư Kí Hoàn Vũ' : 'Anh';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
@@ -555,8 +569,36 @@ function appendChatMessage(text, sender) {
     }
 
     msgDiv.appendChild(contentDiv);
+
+    // Add "Read more" mechanics for collapsible content
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'read-more-btn';
+    toggleBtn.innerText = 'Xem thêm...';
+
+    msgDiv.appendChild(toggleBtn);
     chatMessages.appendChild(msgDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Wait briefly for CSS to render, then check height
+    setTimeout(() => {
+        if (contentDiv.scrollHeight > 250) {
+            toggleBtn.classList.add('visible');
+            toggleBtn.addEventListener('click', () => {
+                if (contentDiv.classList.contains('expanded')) {
+                    contentDiv.classList.remove('expanded');
+                    toggleBtn.innerText = 'Xem thêm...';
+                    // Scroll back up to the message start
+                    msgDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    contentDiv.classList.add('expanded');
+                    toggleBtn.innerText = 'Thu gọn';
+                }
+            });
+        }
+    }, 50);
+
+    if (!isRestoring) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
 }
 
 function appendChatLoading() {
