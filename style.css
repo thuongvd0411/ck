@@ -304,6 +304,39 @@ nav {
     color: white;
 }
 
+/* --- CHECKBOX GROUPS --- */
+.checkbox-group {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: normal;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--glass-border);
+    transition: var(--transition-fast);
+}
+
+.checkbox-group label:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    accent-color: var(--accent-blue);
+    transform: scale(1.1);
+    margin: 0;
+    padding: 0;
+}
+
 /* --- SUGGESTIONS & WIDGETS --- */
 .suggestions {
     display: flex;

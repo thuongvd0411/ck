@@ -85,31 +85,34 @@
                 </div>
                 <div class="profile-container glass-panel">
                     <p class="profile-desc">Hệ thống sẽ ghi nhớ phong cách đầu tư của bạn để đưa ra nhận định cá nhân
-                        hóa nhất. Bạn có thể tự điền ở đây hoặc AI sẽ tự học qua quá trình bạn Chat.</p>
+                        hóa nhất. Bạn có thể tự chọn ở đây hoặc AI sẽ tự học qua quá trình bạn Chat.</p>
 
                     <div class="form-group">
                         <label>Mức chấp nhận rủi ro</label>
-                        <input type="text" id="profile-risk" placeholder="Ví dụ: Thấp, Trung bình">
+                        <div class="checkbox-group" id="profile-risk-group">
+                            <label><input type="checkbox" value="Thấp"> Thấp</label>
+                            <label><input type="checkbox" value="Trung bình"> Trung bình</label>
+                            <label><input type="checkbox" value="Cao"> Cao</label>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Thời gian đầu tư</label>
-                        <input type="text" id="profile-time" placeholder="Ví dụ: Ngắn hạn, Dài hạn">
+                        <div class="checkbox-group" id="profile-time-group">
+                            <label><input type="checkbox" value="Ngắn hạn"> Ngắn hạn (dưới 3 tháng)</label>
+                            <label><input type="checkbox" value="Trung hạn"> Trung hạn (3 tháng - 1 năm)</label>
+                            <label><input type="checkbox" value="Dài hạn"> Dài hạn (trên 1 năm)</label>
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Phong cách ưa thích</label>
-                        <input type="text" id="profile-style" placeholder="Ví dụ: Tăng trưởng, Phòng thủ, Cổ tức">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Ngành quan tâm (ví dụ: Công nghệ, Ngân hàng)</label>
-                        <input type="text" id="profile-sectors" placeholder="Ngành quan tâm...">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Cổ phiếu đang nắm giữ (ví dụ: FPT, HPG)</label>
-                        <input type="text" id="profile-holdings" placeholder="Mã cổ phiếu...">
+                        <div class="checkbox-group" id="profile-style-group">
+                            <label><input type="checkbox" value="Tăng trưởng"> Tăng trưởng</label>
+                            <label><input type="checkbox" value="Phòng thủ"> Phòng thủ</label>
+                            <label><input type="checkbox" value="Cổ tức"> Cổ tức</label>
+                            <label><input type="checkbox" value="Đầu cơ"> Đầu cơ lướt sóng</label>
+                        </div>
                     </div>
 
                     <button id="save-profile-btn" class="primary-btn" style="width: 100%; margin-top: 1rem;">Lưu hồ

@@ -18,11 +18,6 @@ const chatSendBtn = document.getElementById('chat-send-btn');
 const clearChatBtn = document.getElementById('clear-chat-btn');
 
 // Profile Elements
-const profileRisk = document.getElementById('profile-risk');
-const profileTime = document.getElementById('profile-time');
-const profileStyle = document.getElementById('profile-style');
-const profileSectors = document.getElementById('profile-sectors');
-const profileHoldings = document.getElementById('profile-holdings');
 const saveProfileBtn = document.getElementById('save-profile-btn');
 const clearProfileBtn = document.getElementById('clear-profile-btn');
 
@@ -30,7 +25,7 @@ const clearProfileBtn = document.getElementById('clear-profile-btn');
 let chatHistory = JSON.parse(localStorage.getItem('ai_stock_chat_history')) || [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
+        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu. TUYỆT ĐỐI KHÔNG CHỦ ĐỘNG HỎI NGƯỜI DÙNG CUNG CẤP HỒ SƠ CÁ NHÂN nếu họ không nhắc đến." }],
     },
     {
         role: "model",
@@ -40,11 +35,9 @@ let chatHistory = JSON.parse(localStorage.getItem('ai_stock_chat_history')) || [
 
 // State Management: User Profile
 let userProfile = JSON.parse(localStorage.getItem('ai_stock_user_profile')) || {
-    risk: "",
-    time: "",
-    style: "",
-    sectors: "",
-    holdings: ""
+    risk: [],
+    time: [],
+    style: []
 };
 
 let hasInitializedGreeting = localStorage.getItem('has_initialized_greeting') === 'true';
@@ -115,21 +108,32 @@ function init(forceModal = false) {
     }
 }
 
+function setCheckboxes(groupId, values) {
+    const group = document.getElementById(groupId);
+    if (!group || !values) return;
+    const checkboxes = group.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        cb.checked = values.includes(cb.value);
+    });
+}
+function getCheckboxes(groupId) {
+    const group = document.getElementById(groupId);
+    if (!group) return [];
+    const checkboxes = Array.from(group.querySelectorAll('input[type="checkbox"]:checked'));
+    return checkboxes.map(cb => cb.value);
+}
+
 function loadProfileToUI() {
-    profileRisk.value = userProfile.risk;
-    profileTime.value = userProfile.time;
-    profileStyle.value = userProfile.style;
-    profileSectors.value = userProfile.sectors;
-    profileHoldings.value = userProfile.holdings;
+    setCheckboxes('profile-risk-group', userProfile.risk || []);
+    setCheckboxes('profile-time-group', userProfile.time || []);
+    setCheckboxes('profile-style-group', userProfile.style || []);
 }
 
 function saveProfileFromUI() {
     userProfile = {
-        risk: profileRisk.value,
-        time: profileTime.value,
-        style: profileStyle.value,
-        sectors: profileSectors.value.trim(),
-        holdings: profileHoldings.value.trim()
+        risk: getCheckboxes('profile-risk-group'),
+        time: getCheckboxes('profile-time-group'),
+        style: getCheckboxes('profile-style-group')
     };
     localStorage.setItem('ai_stock_user_profile', JSON.stringify(userProfile));
     alert('Đã lưu hồ sơ đầu tư!');
@@ -137,11 +141,9 @@ function saveProfileFromUI() {
 
 function getProfileSummary() {
     let summary = "Hồ sơ Nhà Đầu Tư hiện tại:\n";
-    summary += `- Mức rủi ro: ${userProfile.risk || 'Chưa rõ'}\n`;
-    summary += `- Thời gian ĐT: ${userProfile.time || 'Chưa rõ'}\n`;
-    summary += `- Phong cách: ${userProfile.style || 'Chưa rõ'}\n`;
-    summary += `- Ngành quan tâm: ${userProfile.sectors || 'Chưa rõ'}\n`;
-    summary += `- Cổ phiếu đang giữ: ${userProfile.holdings || 'Chưa rõ'}\n`;
+    summary += `- Mức rủi ro: ${(userProfile.risk && userProfile.risk.length) ? userProfile.risk.join(', ') : 'Chưa rõ'}\n`;
+    summary += `- Thời gian ĐT: ${(userProfile.time && userProfile.time.length) ? userProfile.time.join(', ') : 'Chưa rõ'}\n`;
+    summary += `- Phong cách: ${(userProfile.style && userProfile.style.length) ? userProfile.style.join(', ') : 'Chưa rõ'}\n`;
     return summary;
 }
 
@@ -204,7 +206,7 @@ saveProfileBtn.addEventListener('click', saveProfileFromUI);
 
 clearProfileBtn.addEventListener('click', () => {
     if (confirm("Bạn có chắc muốn xóa toàn bộ hồ sơ nhà đầu tư?")) {
-        userProfile = { risk: "", time: "", style: "", sectors: "", holdings: "" };
+        userProfile = { risk: [], time: [], style: [] };
         localStorage.removeItem('ai_stock_user_profile');
         loadProfileToUI();
         alert('Đã xóa hồ sơ.');
@@ -217,7 +219,7 @@ clearChatBtn.addEventListener('click', () => {
         chatHistory = [
             {
                 role: "user",
-                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
+                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu. TUYỆT ĐỐI KHÔNG CHỦ ĐỘNG HỎI NGƯỜI DÙNG CUNG CẤP HỒ SƠ CÁ NHÂN nếu họ không nhắc đến." }],
             },
             {
                 role: "model",
@@ -512,8 +514,6 @@ async function handleChatSend() {
                 if (parsedProfile.risk) userProfile.risk = parsedProfile.risk;
                 if (parsedProfile.time) userProfile.time = parsedProfile.time;
                 if (parsedProfile.style) userProfile.style = parsedProfile.style;
-                if (parsedProfile.sectors) userProfile.sectors = parsedProfile.sectors;
-                if (parsedProfile.holdings) userProfile.holdings = parsedProfile.holdings;
 
                 localStorage.setItem('ai_stock_user_profile', JSON.stringify(userProfile));
                 loadProfileToUI();
@@ -601,7 +601,7 @@ async function callChatGeminiAPI(fullHistory, isRetry = false) {
     // Inject dynamic User Profile info as a hidden system instruction
     const profileSummaryMsg = {
         role: "user",
-        parts: [{ text: `[SYSTEM INSTRUCTION: ${getProfileSummary()}\nHãy dựa vào hồ sơ này để cá nhân hóa phân tích. NẾU người dùng thay đổi hoặc cung cấp thêm góc nhìn (ví dụ: tôi đổi sang thích an toàn, tôi mới mua FPT...), HÃY xuất ra MỘT khối JSON ở CUỐI CÙNG tin nhắn với định dạng: \`\`\`json\n{ "risk": "Thấp/Trung bình/Cao", "time": "Ngắn/Trung/Dài hạn", "style": "Tăng trưởng/Phòng thủ/Cổ tức/Đầu cơ", "sectors": "...", "holdings": "..." }\n\`\`\` NẾU KHÔNG CẬP NHẬT GÌ thì KHÔNG ghi JSON.]` }]
+        parts: [{ text: `[SYSTEM INSTRUCTION: ${getProfileSummary()}\nHãy dựa vào hồ sơ này để cá nhân hóa phân tích. NẾU người dùng thay đổi hoặc cung cấp thêm góc nhìn, HÃY xuất ra MỘT khối JSON ở CUỐI CÙNG tin nhắn với định dạng: \`\`\`json\n{ "risk": ["Thấp","Cao"], "time": ["Ngắn hạn"], "style": ["Tăng trưởng"] }\n\`\`\` (giá trị là mảng). NẾU KHÔNG CẬP NHẬT GÌ thì KHÔNG ghi JSON. Đặc biệt, KHÔNG phản hồi bằng cách gặng hỏi cung cấp thông tin hồ sơ.]` }]
     };
     optimizedHistory.push(profileSummaryMsg);
     optimizedHistory.push({ role: "model", parts: [{ text: "Đã rõ." }] });
