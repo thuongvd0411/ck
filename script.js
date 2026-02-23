@@ -11,11 +11,21 @@ const tabContents = document.querySelectorAll('.tab-content');
 const loadingOverlay = document.getElementById('loading-overlay');
 const loadingText = document.getElementById('loading-text');
 
-// Welcome Elements
-const weatherCurrent = document.getElementById('weather-current');
-const weatherAdvice = document.getElementById('weather-advice');
-const weatherForecast = document.getElementById('weather-forecast');
+// Chatbox Elements
+const chatMessages = document.getElementById('chat-messages');
+const chatInput = document.getElementById('chat-input');
+const chatSendBtn = document.getElementById('chat-send-btn');
 
+let chatHistory = [
+    {
+        role: "user",
+        parts: [{ text: "Hãy đóng vai một chuyên gia tư vấn chứng khoán chuyên nghiệp tại Việt Nam. Tên tôi là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn và súc tích." }],
+    },
+    {
+        role: "model",
+        parts: [{ text: "Xin chào **Thưởng Vương Đức**! Chúc bạn một ngày đầu tư thành công. Tôi có thể giúp gì cho bạn hôm nay?" }]
+    }
+];
 // Dashboard Elements
 const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
 const dashboardResult = document.getElementById('dashboard-result');
@@ -50,7 +60,7 @@ function init() {
         apiKeyModal.classList.add('hidden');
         appContainer.classList.remove('hidden');
         loadDashboard(); // Load dashboard cache if available
-        loadWeather(); // Load welcome screen
+        // Chat starts ready
     }
 }
 
@@ -96,6 +106,20 @@ refreshDashboardBtn.addEventListener('click', () => {
 
 refreshNewsBtn.addEventListener('click', () => {
     scanNews(true); // Always force refresh when button is clicked or check cache
+});
+
+// Chatbox
+chatSendBtn.addEventListener('click', handleChatSend);
+chatInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleChatSend();
+    }
+});
+
+chatInput.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
 });
 
 // Sector Suggestions
@@ -238,66 +262,94 @@ async function fetchMarketSnapshot() {
 }
 
 // === Feature Implementations ===
-async function loadWeather() {
-    const cacheKey = `weather_welcome_${getTodayString()}`;
-    const cachedWeather = localStorage.getItem(cacheKey);
+// === Chatbox Logic ===
+async function handleChatSend() {
+    const text = chatInput.value.trim();
+    if (!text) return;
 
-    if (cachedWeather) {
-        const data = JSON.parse(cachedWeather);
-        weatherCurrent.innerHTML = data.current;
-        weatherAdvice.innerHTML = data.advice;
-        weatherForecast.innerHTML = data.forecast;
-        return;
+    appendChatMessage(text, 'user');
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+
+    chatHistory.push({ role: "user", parts: [{ text }] });
+
+    const loadingId = appendChatLoading();
+
+    const responseText = await callChatGeminiAPI(chatHistory);
+
+    document.getElementById(loadingId)?.remove();
+
+    if (responseText) {
+        chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+        appendChatMessage(responseText, 'bot');
+    } else {
+        appendChatMessage("Xin lỗi, đã có lỗi xảy ra. Hãy kiểm tra kết nối và thử lại.", 'bot');
+        chatHistory.pop(); // Revert user message from history on fail
+    }
+}
+
+function appendChatMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${sender}`;
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content markdown-body';
+
+    if (sender === 'bot') {
+        contentDiv.innerHTML = marked.parse(text);
+    } else {
+        contentDiv.innerText = text; // Plain text cho tin nhắn của user
     }
 
+    msgDiv.appendChild(contentDiv);
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function appendChatLoading() {
+    const id = 'loading-' + Date.now();
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message bot`;
+    msgDiv.id = id;
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content';
+    contentDiv.innerHTML = '<span class="skeleton-text">Đang suy nghĩ...</span>';
+    msgDiv.appendChild(contentDiv);
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return id;
+}
+
+async function callChatGeminiAPI(history) {
+    if (!GEMINI_API_KEY) {
+        alert("Thiếu API Key!");
+        init();
+        return null;
+    }
+
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
     try {
-        // Lấy thời tiết Hà Nội (mặc định) từ Open-Meteo
-        const weatherRes = await fetch("https://api.open-meteo.com/v1/forecast?latitude=21.0245&longitude=105.8412&current_weather=true&hourly=temperature_2m,weathercode&timezone=Asia%2FBangkok");
-        const weatherData = await weatherRes.json();
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: history,
+                generationConfig: {
+                    temperature: 0.7,
+                }
+            })
+        });
 
-        const temp = weatherData.current_weather.temperature;
-        const code = weatherData.current_weather.weathercode;
-        // Trạng thái thời tiết cơ bản (WMO Code)
-        let desc = "Trời trong";
-        if (code >= 1 && code <= 3) desc = "Có mây";
-        if (code >= 51 && code <= 67) desc = "Có mưa nhẹ";
-        if (code >= 80 && code <= 82) desc = "Mưa rào lớn";
-        if (code >= 95) desc = "Có giông bão";
-
-        const hourIndex = new Date().getHours();
-        const next4HoursTemps = weatherData.hourly.temperature_2m.slice(hourIndex, hourIndex + 4);
-
-        const prompt = `Bạn là trợ lý ảo AI thông minh hiển thị trên Dashboard.
-        
-Người dùng tên là: Thưởng Vương Đức
-Nhiệt độ hiện tại: ${temp}°C
-Tình trạng: ${desc}
-Nhiệt độ 4 giờ tới: ${next4HoursTemps.join('°C, ')}°C
-
-Hãy tạo 3 phần nội dung ngắn gọn cho giao diện (Trả về dạng JSON chuẩn, không markdown code blocks ngoài JSON, không text thừa):
-{
-  "current": "Biểu tượng cảm xúc (Mặt trời/Mây/Mưa...) + Nhiệt độ °C - Tình trạng ngắn gọn",
-  "advice": "Gợi ý ăn mặc và lời chúc tinh thần cho Thưởng Vương Đức",
-  "forecast": "Dự báo 4h tới: (ví dụ: Nhiệt độ duy trì quanh X độ, trời có mưa/nắng...)"
-}`;
-
-        const resultJsonStr = await callGeminiAPI(prompt);
-        if (resultJsonStr) {
-            // Parse json from result string (it might contain markdown ticks)
-            const cleanStr = resultJsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
-            const resultData = JSON.parse(cleanStr);
-
-            weatherCurrent.innerHTML = resultData.current;
-            weatherAdvice.innerHTML = resultData.advice;
-            weatherForecast.innerHTML = resultData.forecast;
-
-            localStorage.setItem(cacheKey, JSON.stringify(resultData));
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
         }
-    } catch (e) {
-        console.error("Lỗi lấy thời tiết:", e);
-        weatherCurrent.innerHTML = "☀️ Không thể tải thời tiết lúc này";
-        weatherAdvice.innerHTML = "Chúc Thưởng Vương Đức một ngày giao dịch thành công!";
-        weatherForecast.innerHTML = "";
+
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+    } catch (error) {
+        console.error("API Error:", error);
+        return null;
     }
 }
 
