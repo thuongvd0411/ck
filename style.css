@@ -842,50 +842,6 @@ nav {
     filter: drop-shadow(0 0 5px var(--neon-cyan));
 }
 
-margin-bottom: 0;
-}
-
-.chat-input-area {
-    padding: 20px;
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    gap: 15px;
-    align-items: flex-end;
-    background: rgba(10, 14, 23, 0.7);
-    backdrop-filter: blur(10px);
-}
-
-.chat-input-area textarea {
-    flex: 1;
-    background-color: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 14px 18px;
-    border-radius: 12px;
-    resize: none;
-    height: 52px;
-    max-height: 150px;
-    font-family: inherit;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.chat-input-area textarea:focus {
-    border-color: var(--accent-hover);
-    box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
-}
-
-#chat-send-btn {
-    height: 45px;
-    width: 45px;
-    min-width: 45px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-}
 
 .skeleton-text {
     animation: pulse 1.5s infinite;
@@ -1191,20 +1147,17 @@ details>div {
     }
 
     /* Make chat input better on mobile */
-    .chat-input-area {
-        flex-direction: column;
-        gap: 10px;
-        padding: 15px;
-        align-items: stretch;
+    .cyber-input-area {
+        padding: 10px 15px 15px 15px;
     }
 
-    .chat-input-area textarea {
+    #chat-input {
         height: 48px;
     }
 
-    #chat-send-btn {
-        width: 100%;
-        padding: 12px;
+    .cyber-send-btn {
+        width: 48px;
+        height: 48px;
     }
 
     .input-group {
