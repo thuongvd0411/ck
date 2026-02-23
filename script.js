@@ -554,7 +554,7 @@ function appendChatMessage(text, sender) {
     // Add avatar label
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = sender === 'bot' ? 'Thư Kí Hoàn Vũ' : 'Bạn';
+    avatarLabel.innerText = sender === 'bot' ? 'HOAN VU' : 'Bạn';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
@@ -580,7 +580,7 @@ function appendChatLoading() {
 
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = 'Thư Kí Hoàn Vũ';
+    avatarLabel.innerText = 'HOAN VU';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
