@@ -94,8 +94,8 @@ function rotateKey() {
 }
 
 // === Initialize App ===
-function init(forceStart = false) {
-    if (!userApiKey && !forceStart) {
+function init(forceModal = false) {
+    if (forceModal) {
         apiKeyModal.classList.remove('hidden');
         appContainer.classList.add('hidden');
     } else {
@@ -105,7 +105,7 @@ function init(forceStart = false) {
         loadProfileToUI();
         loadDashboard(); // Load dashboard cache if available
 
-        if (!hasInitializedGreeting) {
+        if (!hasInitializedGreeting || chatHistory.length <= 2) {
             initChatGreeting();
             hasInitializedGreeting = true;
             localStorage.setItem('has_initialized_greeting', 'true');
@@ -166,7 +166,7 @@ function restoreChatUI() {
 const closeModalBtn = document.getElementById('close-modal-btn');
 if (closeModalBtn) {
     closeModalBtn.addEventListener('click', () => {
-        init(true); // Ignore modal, use default keys
+        init(); // Ignore modal, return to app
     });
 }
 
@@ -183,9 +183,7 @@ saveKeyBtn.addEventListener('click', () => {
 
 changeKeyBtn.addEventListener('click', () => {
     apiKeyInput.value = userApiKey; // Pre-fill
-    localStorage.removeItem('gemini_api_key');
-    userApiKey = '';
-    init(); // show modal again
+    init(true); // show modal again
 });
 
 // Navigation (Tabs)
@@ -375,15 +373,19 @@ async function callGeminiAPI(promptText, isRetry = false) {
         });
 
         if (!response.ok) {
-            if (response.status === 429) {
+            const errorRaw = await response.text();
+            let errorData = {};
+            try { errorData = JSON.parse(errorRaw); } catch (e) { }
+
+            // Check for quota (429) or Leaked API Key (400)
+            if (response.status === 429 || errorRaw.includes("leaked") || response.status === 400) {
                 if (!isRetry && rotateKey()) {
-                    console.log("Hết quota, thử lại với key mới...");
+                    console.log("Hết quota hoặc key lỗi, thử lại với key mới...");
                     return await callGeminiAPI(promptText, true);
                 } else {
-                    throw new Error("Tất cả key dự phòng đều hết hạn mức hoặc lỗi truy cập.");
+                    throw new Error("Tất cả key dự phòng đều hết hạn mức hoặc lỗi.");
                 }
             }
-            const errorData = await response.json();
             throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
         }
 
@@ -627,13 +629,16 @@ async function callChatGeminiAPI(fullHistory, isRetry = false) {
         });
 
         if (!response.ok) {
-            if (response.status === 429) {
+            const errorRaw = await response.text();
+            let errorData = {};
+            try { errorData = JSON.parse(errorRaw); } catch (e) { }
+
+            if (response.status === 429 || errorRaw.includes("leaked") || response.status === 400) {
                 if (!isRetry && rotateKey()) {
-                    console.log("Hết quota, thử lại chat với key mới...");
+                    console.log("Hết quota hoặc key lỗi, thử lại chat với key mới...");
                     return await callChatGeminiAPI(fullHistory, true);
                 }
             }
-            const errorData = await response.json();
             throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
         }
 
