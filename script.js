@@ -70,9 +70,11 @@ const stockSectorBtns = document.querySelectorAll('.stock-sector-btn');
 const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions');
 
 
-// === State Management ===
 const _k = [
-    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB"
+    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB",
+    "QUl6YVN5QkdKTlN3QmNJWExwc3dOOTVGS0R1eGR3d2xlUHl0cjlB",
+    "QUl6YVN5RFdOeUV3ejNieHlUSU9PUUhSUVJ3SGF4UnY5NlgxVnpj",
+    "QUl6YVN5QUs1LVZVblpORXQ1aUhHMGJYd1A4ZGd2aDRPczM2N2VN"
 ];
 let currentKeyIndex = 0;
 let userApiKey = localStorage.getItem('gemini_api_key') || '';
