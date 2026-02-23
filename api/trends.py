@@ -36,8 +36,9 @@ def get_pytrends_data(kw_list, timeframe):
     
     return None, None
 
-@app.route('/api/trends', methods=['GET'])
-def get_trends():
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>', methods=['GET'])
+def get_trends(path):
     symbol = request.args.get('symbol', '').strip().upper()
     months = request.args.get('months', '4')
     
