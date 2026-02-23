@@ -40,9 +40,7 @@
             </div>
             <nav id="main-nav">
                 <button class="nav-btn active" data-target="welcome-tab">Chatbox</button>
-                <button class="nav-btn" data-target="profile-tab">Hồ sơ</button>
-                <button class="nav-btn" data-target="stock-tab">Chấm điểm</button>
-                <button class="nav-btn" data-target="compare-tab">So sánh</button>
+                <button class="nav-btn" data-target="analysis-tab">Phân tích Cá nhân</button>
                 <button class="nav-btn" data-target="news-tab">Tin tức</button>
                 <button class="nav-btn" data-target="dashboard-tab">Vĩ mô</button>
             </nav>
@@ -78,46 +76,88 @@
                 </div>
             </section>
 
-            <!-- Tab: Hồ sơ nhà đầu tư (NEW) -->
-            <section id="profile-tab" class="tab-content hidden">
-                <div class="tab-header">
-                    <h2>Hồ Sơ Nhà Đầu Tư</h2>
-                    <button id="clear-profile-btn" class="secondary-btn">Xóa bộ nhớ</button>
-                </div>
-                <div class="profile-container glass-panel">
-                    <p class="profile-desc">Hệ thống sẽ ghi nhớ phong cách đầu tư của bạn để đưa ra nhận định cá nhân
-                        hóa nhất. Bạn có thể tự điền ở đây hoặc AI sẽ tự học qua quá trình bạn Chat.</p>
+            <!-- Tab: Phân tích Cá nhân (Gộp Hồ sơ, Chấm điểm, So sánh) -->
+            <section id="analysis-tab" class="tab-content hidden">
+                <div class="analysis-grid">
+                    <!-- Column 1: Hồ sơ -->
+                    <div class="analysis-column">
+                        <div class="tab-header">
+                            <h2>Hồ Sơ Đầu Tư</h2>
+                            <button id="clear-profile-btn" class="secondary-btn">Xóa bộ nhớ</button>
+                        </div>
+                        <div class="profile-container glass-panel">
+                            <p class="profile-desc">Hệ thống ghi nhớ phong cách của bạn để cá nhân hóa phân tích.</p>
 
-                    <div class="form-group">
-                        <label>Mức chấp nhận rủi ro (Có thể chọn nhiều)</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="profile-risk" value="Thấp"> Thấp</label>
-                            <label><input type="checkbox" name="profile-risk" value="Trung bình"> Trung bình</label>
-                            <label><input type="checkbox" name="profile-risk" value="Cao"> Cao</label>
+                            <div class="form-group">
+                                <label>Mức chấp nhận rủi ro</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="profile-risk" value="Thấp"> Thấp</label>
+                                    <label><input type="checkbox" name="profile-risk" value="Trung bình"> TB</label>
+                                    <label><input type="checkbox" name="profile-risk" value="Cao"> Cao</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Thời gian đầu tư</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="profile-time" value="Ngắn hạn"> Ngắn</label>
+                                    <label><input type="checkbox" name="profile-time" value="Trung hạn"> Trung</label>
+                                    <label><input type="checkbox" name="profile-time" value="Dài hạn"> Dài</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Phong cách ưa thích</label>
+                                <div class="checkbox-group">
+                                    <label><input type="checkbox" name="profile-style" value="Tăng trưởng"> Tăng
+                                        trưởng</label>
+                                    <label><input type="checkbox" name="profile-style" value="Phòng thủ"> Phòng
+                                        thủ</label>
+                                    <label><input type="checkbox" name="profile-style" value="Cổ tức"> Cổ tức</label>
+                                    <label><input type="checkbox" name="profile-style" value="Đầu cơ"> Đầu cơ</label>
+                                </div>
+                            </div>
+                            <button id="save-profile-btn" class="primary-btn" style="width: 100%; margin-top: 1rem;">Lưu
+                                hồ sơ</button>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>Thời gian đầu tư (Có thể chọn nhiều)</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="profile-time" value="Ngắn hạn"> Ngắn hạn</label>
-                            <label><input type="checkbox" name="profile-time" value="Trung hạn"> Trung hạn</label>
-                            <label><input type="checkbox" name="profile-time" value="Dài hạn"> Dài hạn</label>
+                    <!-- Column 2: Chấm điểm & So sánh -->
+                    <div class="analysis-column">
+                        <div class="tab-header">
+                            <h2>Chấm Điểm & So Sánh</h2>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Phong cách ưa thích (Có thể chọn nhiều)</label>
-                        <div class="checkbox-group">
-                            <label><input type="checkbox" name="profile-style" value="Tăng trưởng"> Tăng trưởng</label>
-                            <label><input type="checkbox" name="profile-style" value="Phòng thủ"> Phòng thủ</label>
-                            <label><input type="checkbox" name="profile-style" value="Cổ tức"> Cổ tức</label>
-                            <label><input type="checkbox" name="profile-style" value="Đầu cơ"> Đầu cơ</label>
+                        <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 1.5rem;">
+                            <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Khuyến nghị ngành:</h3>
+                            <div class="suggestions" id="stock-sector-suggestions">
+                                <button class="suggestion-btn stock-sector-btn">Ngân hàng</button>
+                                <button class="suggestion-btn stock-sector-btn">Công nghệ</button>
+                                <button class="suggestion-btn stock-sector-btn">Chứng khoán</button>
+                                <button class="suggestion-btn stock-sector-btn">Thép</button>
+                            </div>
+                            <div class="suggestions hidden" id="stock-ticker-suggestions" style="margin-top: 1rem;">
+                            </div>
                         </div>
-                    </div>
 
-                    <button id="save-profile-btn" class="primary-btn" style="width: 100%; margin-top: 1rem;">Lưu hồ
-                        sơ</button>
+                        <div class="input-group glass-panel">
+                            <input type="text" id="stock-input" placeholder="Mã cổ phiếu (VD: FPT)">
+                            <button id="analyze-stock-btn" class="primary-btn">Chấm điểm</button>
+                        </div>
+                        <div id="stock-result" class="result-card glass-panel markdown-body hidden"
+                            style="margin-bottom: 2rem;"></div>
+
+                        <div class="input-group glass-panel" style="gap: 0.5rem; flex-wrap: wrap;">
+                            <input type="text" id="compare-stock-1" placeholder="Mã 1 (VD: SSI)"
+                                style="flex: 1; min-width: 100px;">
+                            <span
+                                style="display:flex; align-items:center; color: var(--text-secondary); font-weight: bold;">VS</span>
+                            <input type="text" id="compare-stock-2" placeholder="Mã 2 (VD: VND)"
+                                style="flex: 1; min-width: 100px;">
+                            <button id="compare-stock-btn" class="primary-btn">So sánh</button>
+                        </div>
+                        <div id="compare-result" class="result-card glass-panel markdown-body hidden"></div>
+                    </div>
                 </div>
             </section>
 
@@ -146,51 +186,7 @@
                 </div>
             </section>
 
-            <!-- Tab 3: Chấm điểm Cổ phiếu (Cũ là Phân tích Cổ phiếu) -->
-            <section id="stock-tab" class="tab-content hidden">
-                <div class="tab-header">
-                    <h2>Chấm Điểm Cổ Phiếu Dựa Trên Hồ Sơ</h2>
-                </div>
-                <div class="stock-suggestions-container glass-panel">
-                    <div class="suggestions" id="stock-sector-suggestions">
-                        <span>Gợi ý ngành:</span>
-                        <button class="suggestion-btn stock-sector-btn">Ngân hàng</button>
-                        <button class="suggestion-btn stock-sector-btn">Chứng khoán</button>
-                        <button class="suggestion-btn stock-sector-btn">Bất động sản</button>
-                        <button class="suggestion-btn stock-sector-btn">Thép</button>
-                        <button class="suggestion-btn stock-sector-btn">Bán lẻ</button>
-                        <button class="suggestion-btn stock-sector-btn">Dầu khí</button>
-                        <button class="suggestion-btn stock-sector-btn">Công nghệ</button>
-                        <button class="suggestion-btn stock-sector-btn">Đầu tư công</button>
-                    </div>
-                    <div class="suggestions hidden" id="stock-ticker-suggestions">
-                        <span>Cổ phiếu:</span>
-                        <!-- Nút sẽ được generated bằng JS -->
-                    </div>
-                </div>
-                <div class="input-group glass-panel">
-                    <input type="text" id="stock-input" placeholder="Nhập 1 mã chữ cái (Ví dụ: FPT)">
-                    <button id="analyze-stock-btn" class="primary-btn">Chấm điểm</button>
-                </div>
-                <div id="stock-result" class="result-card glass-panel markdown-body hidden"></div>
-            </section>
 
-            <!-- Tab 4: So Sánh 2 Cổ Phiếu (NEW) -->
-            <section id="compare-tab" class="tab-content hidden">
-                <div class="tab-header">
-                    <h2>So Sánh 2 Cổ Phiếu Cho Hồ Sơ Của Bạn</h2>
-                </div>
-                <div class="input-group glass-panel" style="gap: 0.5rem; flex-wrap: wrap;">
-                    <input type="text" id="compare-stock-1" placeholder="Mã số 1 (Ví dụ: SSI)"
-                        style="flex: 1; min-width: 120px;">
-                    <span
-                        style="display:flex; align-items:center; color: var(--text-secondary); font-weight: bold;">VS</span>
-                    <input type="text" id="compare-stock-2" placeholder="Mã số 2 (Ví dụ: VND)"
-                        style="flex: 1; min-width: 120px;">
-                    <button id="compare-stock-btn" class="primary-btn">So sánh</button>
-                </div>
-                <div id="compare-result" class="result-card glass-panel markdown-body hidden"></div>
-            </section>
         </main>
     </div>
 
