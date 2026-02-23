@@ -71,7 +71,6 @@ const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions
 const _k = [
     "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB",
     "QUl6YVN5QkdKTlN3QmNJWExwc3dOOTVGS0R1eGR3d2xlUHl0cjlB",
-    "QUl6YVN5RFdOeUV3ejNieHlUSU9PUUhSUVJ3SGF4UnY5NlgxVnpj",
     "QUl6YVN5QUs1LVZVblpORXQ1aUhHMGJYd1A4ZGd2aDRPczM2N2VN"
 ];
 let currentKeyIndex = 0;
@@ -400,10 +399,11 @@ async function callGeminiAPI(promptText, retryCount = 0) {
                     console.log("Hết quota hoặc key lỗi, thử lại với key mới...");
                     return await callGeminiAPI(promptText, retryCount + 1);
                 } else {
-                    throw new Error("Tất cả key dự phòng đều hết hạn mức hoặc lỗi.");
+                    const errorMsg = errorData.error?.message || errorRaw;
+                    throw new Error(`API Error ${response.status}: ${errorMsg}. Đã thử hết các key dự phòng.`);
                 }
             }
-            throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
+            throw new Error(errorData.error?.message || `Lỗi không xác định: ${response.status} - ${errorRaw}`);
         }
 
         const data = await response.json();
@@ -656,9 +656,12 @@ async function callChatGeminiAPI(fullHistory, retryCount = 0) {
                 if (retryCount < _k.length && rotateKey()) {
                     console.log("Hết quota hoặc key lỗi, thử lại chat với key mới...");
                     return await callChatGeminiAPI(fullHistory, retryCount + 1);
+                } else {
+                    const errorMsg = errorData.error?.message || errorRaw;
+                    throw new Error(`API Error ${response.status}: ${errorMsg}`);
                 }
             }
-            throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
+            throw new Error(errorData.error?.message || `Lỗi không xác định: ${response.status} - ${errorRaw}`);
         }
 
         const data = await response.json();
