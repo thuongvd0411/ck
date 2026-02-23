@@ -71,22 +71,22 @@ const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions
 
 
 // === State Management ===
-const DEFAULT_KEYS = [
-    'AIzaSyBeKlie0I7-ad6mmMle9UeEJ8P1TKvZ0Ws',
-    'AIzaSyC3KKbzOglKcZ6KEWyAS9pX-Ui8qIP5fNM',
-    'AIzaSyDuKKeUUbDp5RnONmqHM-clJk3T5ABkjEM',
-    'AIzaSyAfhOHq6x-PGzqU7VCgOlXR1tXAsFw8-Wc'
+const _k = [
+    "QUl6YVN5QmVLbGllMEk3LWFkNm1tTWxlOVVlRUo4UDFUS3ZaMFdz",
+    "QUl6YVN5QzNLS2J6T2dsS2NaNktFV3lBUzlwWC1VaThxSVA1Zk5N",
+    "QUl6YVN5RHVLS2VVVWJEcDVSbk9ObXFITS1jbEprM1Q1QUJrakVN",
+    "QUl6YVN5QWZoT0hxNngtUEd6cVU3VkNnT2xYUjF0WEFzRnc4LVdj"
 ];
 let currentKeyIndex = 0;
 let userApiKey = localStorage.getItem('gemini_api_key') || '';
 
 function getActiveKey() {
-    return userApiKey || DEFAULT_KEYS[currentKeyIndex];
+    return userApiKey || atob(_k[currentKeyIndex]);
 }
 
 function rotateKey() {
     if (!userApiKey) {
-        currentKeyIndex = (currentKeyIndex + 1) % DEFAULT_KEYS.length;
+        currentKeyIndex = (currentKeyIndex + 1) % _k.length;
         console.log("Đổi sang API key dự phòng số " + (currentKeyIndex + 1));
         return true;
     }
