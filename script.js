@@ -19,7 +19,7 @@ const chatSendBtn = document.getElementById('chat-send-btn');
 let chatHistory = [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai một trợ lý AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, logic và dễ hiểu." }],
+        parts: [{ text: "Hãy đóng vai Thư Kí Hoàn Vũ, một thư ký AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Khi được hỏi bạn là ai, hãy trả lời bạn là Thư Kí Hoàn Vũ. Trả lời các câu hỏi ngắn gọn, súc tích, logic và dễ hiểu." }],
     },
     {
         role: "model",
@@ -296,7 +296,7 @@ Hiện tại là ${timeStr} ngày ${dateStr} (GMT+7).
 Thời tiết ở Hà Nội hiện tại: ${temp}°C. ${willRain}.
 Dự báo 4h tới: Nhiệt độ khoảng ${next4HoursTemps.join(', ')} °C.
 
-Hãy viết MỘT câu chào mừng đóng vai Trợ lý Chứng khoán gửi cho người dùng. 
+Hãy viết MỘT câu chào mừng đóng vai Thư Kí Hoàn Vũ gửi cho người dùng. 
 Bao gồm đủ các ý sau nhưng viết GỌN GÀNG, TỰ NHIÊN, hiện đại (Markdown formatting):
 1. Chào Thưởng Vương Đức, báo giờ và ngày hiện tại (GMT+7).
 2. Tóm tắt thời tiết Hà Nội hiện tại: nhiệt độ, có mưa không, gợi ý mặc gì (ví dụ: áo ấm, áo khoác mỏng, mang ô che mưa...).
@@ -359,7 +359,7 @@ function appendChatMessage(text, sender) {
     // Add avatar label
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = sender === 'bot' ? 'Trợ lý AI' : 'Bạn';
+    avatarLabel.innerText = sender === 'bot' ? 'Thư Kí Hoàn Vũ' : 'Bạn';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
@@ -384,12 +384,12 @@ function appendChatLoading() {
 
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = 'Trợ lý AI';
+    avatarLabel.innerText = 'Thư Kí Hoàn Vũ';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = '<span class="skeleton-text">Đang lướt thị trường...</span>';
+    contentDiv.innerHTML = '<span class="skeleton-text">Phân tích thông tin...</span>';
     msgDiv.appendChild(contentDiv);
 
     chatMessages.appendChild(msgDiv);
