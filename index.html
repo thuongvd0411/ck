@@ -55,24 +55,56 @@
                 <p id="loading-text">AI đang phân tích dữ liệu...</p>
             </div>
 
-            <!-- Tab 0: Chatbox -->
+            <!-- Tab 0: Chatbox (Holographic Cyberpunk Redesign) -->
             <section id="welcome-tab" class="tab-content active">
-                <div class="chat-container glass-panel">
-                    <div class="chat-header">
-                        <h2>AI Trợ Lý Đầu Tư Cá Nhân</h2>
-                        <p>Hỏi đáp đa năng, tự động cập nhật hồ sơ qua trò chuyện...</p>
-                        <div class="chat-actions">
-                            <button id="load-history-btn" class="secondary-btn hidden">Lịch sử cũ</button>
-                            <button id="clear-chat-btn" class="secondary-btn">Xóa trò chuyện</button>
+                <div class="cyber-container">
+                    <div class="cyber-header">
+                        <div class="cyber-title"><span class="icon">⚡</span> AI CHATBOT</div>
+                        <div class="cyber-controls">
+                            <button id="load-history-btn" class="cyber-btn-small hidden">Lịch sử</button>
+                            <button id="clear-chat-btn" class="cyber-btn-small">Xóa Log</button>
                         </div>
                     </div>
-                    <div class="chat-messages" id="chat-messages">
-                        <!-- Messages go here -->
-                    </div>
-                    <div class="chat-input-area">
-                        <textarea id="chat-input"
-                            placeholder="Nhập câu hỏi của bạn... (Enter để gửi, Shift+Enter để xuống dòng)"></textarea>
-                        <button id="chat-send-btn" class="primary-btn">Gửi</button>
+
+                    <div class="cyber-layout">
+                        <!-- Left Column: Holographic Avatar -->
+                        <div class="cyber-avatar-panel">
+                            <div class="avatar-frame">
+                                <img src="assets/avatar.png" alt="AURA Hologram" class="hologram-img">
+                                <div class="scanline"></div>
+                            </div>
+                            <div class="avatar-info">
+                                <div class="avatar-name">AURA:</div>
+                                <div class="avatar-subname">Advanced Universal<br>Response Agent</div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Chat Interface -->
+                        <div class="cyber-chat-panel">
+                            <div class="chat-messages" id="chat-messages">
+                                <!-- Messages go here -->
+                            </div>
+
+                            <!-- Graph Decoration (Static mockup based on reference) -->
+                            <div class="cyber-graph-deco">
+                                <div class="graph-box"></div>
+                            </div>
+
+                            <div class="cyber-input-area">
+                                <div class="waveform-deco">
+                                    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                                </div>
+                                <div class="input-glow-wrapper">
+                                    <textarea id="chat-input"
+                                        placeholder="Initiate sequence... (Enter to send, Shift+Enter for new line)"></textarea>
+                                    <button id="chat-send-btn" class="cyber-send-btn">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
