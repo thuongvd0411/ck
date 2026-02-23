@@ -16,8 +16,12 @@ const chatMessages = document.getElementById('chat-messages');
 const chatInput = document.getElementById('chat-input');
 const chatSendBtn = document.getElementById('chat-send-btn');
 const clearChatBtn = document.getElementById('clear-chat-btn');
+const loadHistoryBtn = document.getElementById('load-history-btn');
 
 // Profile Elements
+const profileRisk = document.querySelectorAll('input[name="profile-risk"]');
+const profileTime = document.querySelectorAll('input[name="profile-time"]');
+const profileStyle = document.querySelectorAll('input[name="profile-style"]');
 const saveProfileBtn = document.getElementById('save-profile-btn');
 const clearProfileBtn = document.getElementById('clear-profile-btn');
 
@@ -25,11 +29,11 @@ const clearProfileBtn = document.getElementById('clear-profile-btn');
 let chatHistory = JSON.parse(localStorage.getItem('ai_stock_chat_history')) || [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai Thư Kí Hoàn Vũ, một thư ký AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Khi giao tiếp, TỰ XƯNG LÀ 'em' và GỌI NGƯỜI DÙNG LÀ 'anh'. Trả lời các câu hỏi cực kỳ ngắn gọn, súc tích, logic. Việc xưng hô phải tuyệt đối tuân thủ." }],
+        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
     },
     {
         role: "model",
-        parts: [{ text: "Dạ, em hiểu rồi ạ." }]
+        parts: [{ text: "Đã hiểu." }]
     }
 ];
 
@@ -40,7 +44,6 @@ let userProfile = JSON.parse(localStorage.getItem('ai_stock_user_profile')) || {
     style: []
 };
 
-let hasInitializedGreeting = localStorage.getItem('has_initialized_greeting') === 'true';
 // Dashboard Elements
 const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
 const dashboardResult = document.getElementById('dashboard-result');
@@ -49,7 +52,7 @@ const dashboardResult = document.getElementById('dashboard-result');
 const refreshNewsBtn = document.getElementById('refresh-news-btn');
 const newsResult = document.getElementById('news-result');
 
-// Sector Elements
+// Sector Elements (Legacy, check to avoid null ref)
 const sectorInput = document.getElementById('sector-input');
 const analyzeSectorBtn = document.getElementById('analyze-sector-btn');
 const suggestionBtns = document.querySelectorAll('.suggestion-btn:not(.stock-sector-btn)');
@@ -63,11 +66,9 @@ const stockSectorBtns = document.querySelectorAll('.stock-sector-btn');
 const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions');
 
 
+// === State Management ===
 const _k = [
-    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB",
-    "QUl6YVN5QkdKTlN3QmNJWExwc3dOOTVGS0R1eGR3d2xlUHl0cjlB",
-    "QUl6YVN5RFdOeUV3ejNieHlUSU9PUUhSUVJ3SGF4UnY5NlgxVnpj",
-    "QUl6YVN5QUs1LVZVblpORXQ1aUhHMGJYd1A4ZGd2aDRPczM2N2VN"
+    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB"
 ];
 let currentKeyIndex = 0;
 let userApiKey = localStorage.getItem('gemini_api_key') || '';
@@ -97,41 +98,29 @@ function init(forceModal = false) {
         loadProfileToUI();
         loadDashboard(); // Load dashboard cache if available
 
-        if (chatHistory.length <= 2) {
-            initChatGreeting();
+        // Check if there is history (more than 2 default messages)
+        if (chatHistory.length > 2) {
+            loadHistoryBtn.classList.remove('hidden');
         } else {
-            // Restore chat history UI on load
-            restoreChatUI();
+            loadHistoryBtn.classList.add('hidden');
         }
+
+        // Show greeting on every load
+        initChatGreeting();
     }
 }
 
-function setCheckboxes(groupId, values) {
-    const group = document.getElementById(groupId);
-    if (!group || !values) return;
-    const checkboxes = group.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(cb => {
-        cb.checked = values.includes(cb.value);
-    });
-}
-function getCheckboxes(groupId) {
-    const group = document.getElementById(groupId);
-    if (!group) return [];
-    const checkboxes = Array.from(group.querySelectorAll('input[type="checkbox"]:checked'));
-    return checkboxes.map(cb => cb.value);
-}
-
 function loadProfileToUI() {
-    setCheckboxes('profile-risk-group', userProfile.risk || []);
-    setCheckboxes('profile-time-group', userProfile.time || []);
-    setCheckboxes('profile-style-group', userProfile.style || []);
+    profileRisk.forEach(cb => cb.checked = (userProfile.risk && userProfile.risk.includes(cb.value)));
+    profileTime.forEach(cb => cb.checked = (userProfile.time && userProfile.time.includes(cb.value)));
+    profileStyle.forEach(cb => cb.checked = (userProfile.style && userProfile.style.includes(cb.value)));
 }
 
 function saveProfileFromUI() {
     userProfile = {
-        risk: getCheckboxes('profile-risk-group'),
-        time: getCheckboxes('profile-time-group'),
-        style: getCheckboxes('profile-style-group')
+        risk: Array.from(profileRisk).filter(cb => cb.checked).map(cb => cb.value),
+        time: Array.from(profileTime).filter(cb => cb.checked).map(cb => cb.value),
+        style: Array.from(profileStyle).filter(cb => cb.checked).map(cb => cb.value)
     };
     localStorage.setItem('ai_stock_user_profile', JSON.stringify(userProfile));
     alert('Đã lưu hồ sơ đầu tư!');
@@ -139,9 +128,9 @@ function saveProfileFromUI() {
 
 function getProfileSummary() {
     let summary = "Hồ sơ Nhà Đầu Tư hiện tại:\n";
-    summary += `- Mức rủi ro: ${(userProfile.risk && userProfile.risk.length) ? userProfile.risk.join(', ') : 'Chưa rõ'}\n`;
-    summary += `- Thời gian ĐT: ${(userProfile.time && userProfile.time.length) ? userProfile.time.join(', ') : 'Chưa rõ'}\n`;
-    summary += `- Phong cách: ${(userProfile.style && userProfile.style.length) ? userProfile.style.join(', ') : 'Chưa rõ'}\n`;
+    summary += `- Mức rủi ro: ${userProfile.risk && userProfile.risk.length ? userProfile.risk.join(', ') : 'Chưa rõ'}\n`;
+    summary += `- Thời gian ĐT: ${userProfile.time && userProfile.time.length ? userProfile.time.join(', ') : 'Chưa rõ'}\n`;
+    summary += `- Phong cách: ${userProfile.style && userProfile.style.length ? userProfile.style.join(', ') : 'Chưa rõ'}\n`;
     return summary;
 }
 
@@ -212,34 +201,31 @@ clearProfileBtn.addEventListener('click', () => {
 });
 
 // Chat Management
-const headerClearDataBtn = document.getElementById('header-clear-data-btn');
-if (headerClearDataBtn) {
-    headerClearDataBtn.addEventListener('click', () => {
-        if (confirm("⚠️ CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu bao gồm Lịch sử Chat, Hồ sơ, Key API. \n\nBạn có chắc chắn muốn tiếp tục?")) {
-            localStorage.clear();
-            alert('Đã xóa sạch ứng dụng. Trang sẽ tải lại ngay bây giờ.');
-            window.location.reload();
-        }
-    });
-}
-
 clearChatBtn.addEventListener('click', () => {
     if (confirm("Bạn có chắc muốn xóa lịch sử trò chuyện?")) {
         chatHistory = [
             {
                 role: "user",
-                parts: [{ text: "Hãy đóng vai Thư Kí Hoàn Vũ, một thư ký AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Khi giao tiếp, TỰ XƯNG LÀ 'em' và GỌI NGƯỜI DÙNG LÀ 'anh'. Trả lời các câu hỏi cực kỳ ngắn gọn, súc tích, logic. Việc xưng hô phải tuyệt đối tuân thủ." }],
+                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
             },
             {
                 role: "model",
-                parts: [{ text: "Dạ, em hiểu rồi ạ." }]
+                parts: [{ text: "Đã hiểu." }]
             }
         ];
         localStorage.removeItem('ai_stock_chat_history');
+        loadHistoryBtn.classList.add('hidden');
         chatMessages.innerHTML = '';
         initChatGreeting();
     }
 });
+
+if (loadHistoryBtn) {
+    loadHistoryBtn.addEventListener('click', () => {
+        restoreChatUI();
+        loadHistoryBtn.classList.add('hidden');
+    });
+}
 
 // Feature Triggers
 refreshDashboardBtn.addEventListener('click', () => {
@@ -265,12 +251,16 @@ chatInput.addEventListener('input', function () {
 });
 
 // Sector Suggestions
-suggestionBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        sectorInput.value = btn.innerText;
-        analyzeSectorBtn.click();
+if (suggestionBtns) {
+    suggestionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (sectorInput && analyzeSectorBtn) {
+                sectorInput.value = btn.innerText;
+                analyzeSectorBtn.click();
+            }
+        });
     });
-});
+}
 
 // Nested Stock Suggestions
 const stockMap = {
@@ -309,18 +299,22 @@ stockSectorBtns.forEach(btn => {
     });
 });
 
-analyzeSectorBtn.addEventListener('click', () => {
-    const sector = sectorInput.value.trim();
-    if (sector) {
-        analyzeSector(sector);
-    } else {
-        alert('Vui lòng nhập tên ngành.');
-    }
-});
+if (analyzeSectorBtn) {
+    analyzeSectorBtn.addEventListener('click', () => {
+        const sector = sectorInput.value.trim();
+        if (sector) {
+            analyzeSector(sector);
+        } else {
+            alert('Vui lòng nhập tên ngành.');
+        }
+    });
+}
 
-sectorInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') analyzeSectorBtn.click();
-});
+if (sectorInput) {
+    sectorInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') analyzeSectorBtn.click();
+    });
+}
 
 analyzeStockBtn.addEventListener('click', () => {
     const stock = stockInput.value.trim().toUpperCase();
@@ -451,30 +445,28 @@ async function initChatGreeting() {
         const willRain = maxRainProb > 30 ? `Có khả năng mưa (${maxRainProb}%)` : "Trời khô ráo, không mưa";
 
         const now = new Date();
-        // Format time in GMT+7
         const timeStr = now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
-        const dateStr = now.toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' });
+        const currentHour = now.getHours();
 
-        const greetingPrompt = `Người dùng tên là Thưởng Vương Đức. Bạn nhập vai Thư Kí Hoàn Vũ (xưng em, gọi anh).
-Hiện tại là ${timeStr} ngày ${dateStr} (GMT+7).
-Thời tiết ở Hà Nội hiện tại: ${temp}°C. ${willRain}.
-Dự báo 4h tới: Nhiệt độ khoảng ${next4HoursTemps.join(', ')} °C.
+        let sessionName = "buổi sáng";
+        if (currentHour >= 12 && currentHour < 14) sessionName = "buổi trưa";
+        else if (currentHour >= 14 && currentHour < 18) sessionName = "buổi chiều";
+        else if (currentHour >= 18) sessionName = "buổi tối";
 
-HÃY CUNG CẤP CÂU CHÀO MỞ ĐẦU THEO CHÍNH XÁC YÊU CẦU SAU (Tuyệt đối không sử dụng mẫu 'Chào Thưởng Vương Đức', đi trực tiếp vào câu nói luôn):
-- Đưa ra thời tiết hiện tại ở Hà Nội (Kèm thời gian hiện tại theo GMT+7).
-- Đưa ra lời khuyên anh ấy có thể mặc gì.
-- Dự báo sơ bộ 4 tiếng tới.
-- Chúc 1 ngày đầu tư thành công.
+        const greetingPrompt = `Người dùng tên là Thưởng Vương Đức.
+Tình huống: Người dùng vừa mở ứng dụng AI Chứng Khoán.
+Thời gian hiện tại: ${sessionName}, ${timeStr}.
+Nhiệt độ Hà Nội hiện tại: ${temp}°C. ${willRain}.
+Dự báo 4h tới: Nhiệt độ khoảng ${Math.round(next4HoursTemps.reduce((a, b) => a + b) / next4HoursTemps.length)}°C.
 
-Ví dụ tham khảo mong đợi: "Dạ hiện tại đang là 10:30 sáng ở Hà Nội, trời râm mát 24 độ và không mưa, anh mặc áo phông là thoải mái ạ. Trong 4 tiếng tới nhiệt độ có thể lên 27 độ nhưng vẫn mát mẻ. Chúc anh một ngày đầu tư thành công rực rỡ và bùng nổ lợi nhuận nhé! Hôm nay em có thể hỗ trợ anh tin tức hay cổ phiếu nào không ạ?"`;
+Hãy viết ĐÚNG 1 CÂU chào mừng tham khảo cấu trúc ví dụ dưới đây (chỉ thay đổi thời gian buổi nào, giờ, nhiệt độ, thời tiết cho đúng với hiện tại. Viết tự nhiên, súc tích, KHÔNG THÊM BẤT KỲ câu hỏi nào ở cuối.):
+Ví dụ: "Xin chào buổi trưa anh Thưởng Vương Đức, giờ là 13h, Hà Nội hiện có nhiệt độ 21 độ C, anh có thể mặc áo khoác mỏng và tận hưởng không khí mát mẻ. Dự kiến 4h tới không mưa, nhiệt độ là 23 độ C. chúc anh 1 ngày đầu tư thành công."`;
 
         const responseText = await callChatGeminiAPI([{ role: "user", parts: [{ text: greetingPrompt }] }]);
 
         document.getElementById(loadingId)?.remove();
 
         if (responseText) {
-            chatHistory.push({ role: "model", parts: [{ text: responseText }] });
-            localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
             appendChatMessage(responseText, 'bot');
         } else {
             fallbackGreeting();
@@ -487,9 +479,7 @@ Ví dụ tham khảo mong đợi: "Dạ hiện tại đang là 10:30 sáng ở H
 }
 
 function fallbackGreeting() {
-    const text = "Dạ chào anh! Chúc anh một ngày đầu tư thành công. Hôm nay em có thể phân tích cổ phiếu hay vĩ mô gì cho anh ạ?";
-    chatHistory.push({ role: "model", parts: [{ text }] });
-    localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
+    const text = "Xin chào **Thưởng Vương Đức**! Chúc bạn một ngày đầu tư thành công.";
     appendChatMessage(text, 'bot');
 }
 
@@ -518,9 +508,9 @@ async function handleChatSend() {
         if (jsonMatch && jsonMatch[1]) {
             try {
                 const parsedProfile = JSON.parse(jsonMatch[1]);
-                if (parsedProfile.risk) userProfile.risk = parsedProfile.risk;
-                if (parsedProfile.time) userProfile.time = parsedProfile.time;
-                if (parsedProfile.style) userProfile.style = parsedProfile.style;
+                if (parsedProfile.risk) userProfile.risk = Array.isArray(parsedProfile.risk) ? parsedProfile.risk : [parsedProfile.risk];
+                if (parsedProfile.time) userProfile.time = Array.isArray(parsedProfile.time) ? parsedProfile.time : [parsedProfile.time];
+                if (parsedProfile.style) userProfile.style = Array.isArray(parsedProfile.style) ? parsedProfile.style : [parsedProfile.style];
 
                 localStorage.setItem('ai_stock_user_profile', JSON.stringify(userProfile));
                 loadProfileToUI();
@@ -542,16 +532,15 @@ async function handleChatSend() {
     }
 }
 
-function appendChatMessage(text, sender, isRestoring = false) {
+function appendChatMessage(text, sender) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}`;
 
-    if (sender === 'bot') {
-        const avatarLabel = document.createElement('div');
-        avatarLabel.className = 'message-avatar';
-        avatarLabel.innerText = 'Thư Kí Hoàn Vũ';
-        msgDiv.appendChild(avatarLabel);
-    }
+    // Add avatar label
+    const avatarLabel = document.createElement('div');
+    avatarLabel.className = 'message-avatar';
+    avatarLabel.innerText = sender === 'bot' ? 'Thư Kí Hoàn Vũ' : 'Bạn';
+    msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content markdown-body';
@@ -559,15 +548,12 @@ function appendChatMessage(text, sender, isRestoring = false) {
     if (sender === 'bot') {
         contentDiv.innerHTML = marked.parse(text);
     } else {
-        contentDiv.innerText = text;
+        contentDiv.innerText = text; // Plain text cho tin nhắn của user
     }
 
     msgDiv.appendChild(contentDiv);
     chatMessages.appendChild(msgDiv);
-
-    if (!isRestoring) {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 function appendChatLoading() {
@@ -583,7 +569,7 @@ function appendChatLoading() {
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    contentDiv.innerHTML = '<span class="skeleton-text">Phân tích thông tin...</span>';
     msgDiv.appendChild(contentDiv);
 
     chatMessages.appendChild(msgDiv);
@@ -603,26 +589,33 @@ async function callChatGeminiAPI(fullHistory, isRetry = false) {
     // Rule: Send System Prompt + Profile Summary + Last 5 messages only.
     let optimizedHistory = [];
 
-    // Always keep the original System prompts (first 2 messages)
-    if (fullHistory.length >= 2) {
+    // Check if this is a standard chat history that requires profile injection
+    const isStandardChat = fullHistory.length >= 2 &&
+        fullHistory[0].parts && fullHistory[0].parts[0].text.includes("Hãy đóng vai AI Trợ Lý");
+
+    if (isStandardChat) {
+        // Always keep the original System prompts (first 2 messages)
         optimizedHistory.push(fullHistory[0]);
         optimizedHistory.push(fullHistory[1]);
+
+        // Inject dynamic User Profile info as a hidden system instruction
+        const profileSummaryMsg = {
+            role: "user",
+            parts: [{ text: `[SYSTEM INSTRUCTION: ${getProfileSummary()}\nHãy dựa vào hồ sơ này để cá nhân hóa phân tích. NẾU người dùng thay đổi hoặc cung cấp thêm góc nhìn (ví dụ: tôi đổi sang thích an toàn, tôi bắt đầu đầu tư lướt sóng...), HÃY xuất ra MỘT khối JSON ở CUỐI CÙNG tin nhắn với định dạng: \`\`\`json\n{ "risk": ["Thấp", "Trung bình", "Cao"], "time": ["Ngắn hạn", "Trung hạn", "Dài hạn"], "style": ["Tăng trưởng", "Phòng thủ", "Cổ tức", "Đầu cơ"] }\n\`\`\` (Chỉ đưa các lựa chọn phù hợp nhất vào mảng). NẾU KHÔNG CẬP NHẬT GÌ thì KHÔNG ghi JSON.]` }]
+        };
+        optimizedHistory.push(profileSummaryMsg);
+        optimizedHistory.push({ role: "model", parts: [{ text: "Đã rõ." }] });
+
+        // Grab up to the last 5 messages from the actual conversation history
+        const recentMessagesCount = 5;
+        const conversationPart = fullHistory.slice(2); // Skip the first 2 static sys prompts
+        let recentMessages = conversationPart.slice(-recentMessagesCount);
+
+        optimizedHistory = optimizedHistory.concat(recentMessages);
+    } else {
+        // Standalone prompts (like greeting) don't need profile injection and history slicing
+        optimizedHistory = fullHistory;
     }
-
-    // Inject dynamic User Profile info as a hidden system instruction
-    const profileSummaryMsg = {
-        role: "user",
-        parts: [{ text: `[SYSTEM INSTRUCTION: ${getProfileSummary()}\nHãy dựa vào hồ sơ này để cá nhân hóa phân tích. NẾU người dùng thay đổi hoặc cung cấp thêm góc nhìn, HÃY xuất ra MỘT khối JSON ở CUỐI CÙNG tin nhắn với định dạng: \`\`\`json\n{ "risk": ["Thấp","Cao"], "time": ["Ngắn hạn"], "style": ["Tăng trưởng"] }\n\`\`\` (giá trị là mảng). NẾU KHÔNG CẬP NHẬT GÌ thì KHÔNG ghi JSON. Đặc biệt, KHÔNG phản hồi bằng cách gặng hỏi cung cấp thông tin hồ sơ.]` }]
-    };
-    optimizedHistory.push(profileSummaryMsg);
-    optimizedHistory.push({ role: "model", parts: [{ text: "Đã rõ." }] });
-
-    // Grab up to the last 5 messages from the actual conversation history
-    const recentMessagesCount = 5;
-    const conversationPart = fullHistory.slice(2); // Skip the first 2 static sys prompts
-    let recentMessages = conversationPart.slice(-recentMessagesCount);
-
-    optimizedHistory = optimizedHistory.concat(recentMessages);
 
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -882,7 +875,7 @@ YÊU CẦU PHÂN TÍCH (trình bày bằng Markdown dễ nhìn):
 2. Phân tích cơ bản & Tài chính hiện tại.
 3. Phân tích triển vọng ngành.
 4. Đánh giá định giá (Rẻ, Hợp lý hay Đắt).
-5. CHẤM ĐIỂM CỔ PHIẾU: Đưa ra điểm số theo MỨC ĐỘ PHÙ HỢP trên thang 100 điểm. Để hiển thị thanh tiến trình 100%, bạn BẮT BUỘC phải chèn cú pháp chính xác là [SCORE:X] vào cuối cùng mục này, trong đó X là số điểm (Ví dụ: [SCORE:75]).
+5. CHẤM ĐIỂM CỔ PHIẾU: Đưa ra điểm số khách quan trên thang 100 điểm. Hãy in đậm dòng này (Ví dụ: **Điểm đánh giá tổng thể: 75/100**).
 6. NHẬN ĐỊNH SỰ PHÙ HỢP: Dựa vào hồ sơ nhà đầu tư (mức rủi ro, thời gian, phong cách), hãy đưa ra lời khuyên cụ thể.
 NẾU cổ phiếu có rủi ro cao (hoặc tính đầu cơ mạnh) mà nhà đầu tư thuộc nhóm an toàn/rủi ro thấp, BẮT BUỘC có dòng CẢNH BÁO in đậm chặn đầu.
 
@@ -891,9 +884,7 @@ Tính khách quan, logic, không hô hào.`;
     const resultMarkdown = await callGeminiAPI(prompt);
 
     if (resultMarkdown) {
-        // Regex to find [SCORE:XX] and replace it with HTML
-        let finalMd = resultMarkdown.replace(/\[SCORE:\s*(\d+)\]/g, '<div class="point-score">$1/100</div><div class="score-progress-bg"><div class="score-progress-fill" style="width: $1%"></div></div>');
-        stockResult.innerHTML = marked.parse(finalMd);
+        stockResult.innerHTML = marked.parse(resultMarkdown);
         stockResult.classList.remove('hidden');
     }
 }
