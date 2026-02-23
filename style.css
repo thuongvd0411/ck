@@ -1,15 +1,15 @@
 /* CSS Variables & Theme Options */
 :root {
-    --bg-dark: #0f172a;
-    --bg-darker: #020617;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
+    --bg-dark: #1e293b;
+    --bg-darker: #0f172a;
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1;
     --accent-blue: #3b82f6;
     --accent-blue-hover: #2563eb;
     --accent-green: #10b981;
     --accent-red: #ef4444;
-    --glass-bg: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(30, 41, 59, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.15);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --radius-lg: 12px;
     --radius-md: 8px;
@@ -26,8 +26,8 @@
 body {
     background: var(--bg-darker);
     background-image:
-        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%);
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.1) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.05) 0px, transparent 50%);
     color: var(--text-primary);
     min-height: 100vh;
     display: flex;
@@ -554,25 +554,79 @@ details>div {
         flex-direction: column;
         gap: 1rem;
         padding: 1rem;
+        align-items: center;
+    }
+
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .nav-btn {
+        padding: 0.5rem;
+        font-size: 0.95rem;
     }
 
     #change-key-btn {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
+        position: static;
+        margin-top: 0.5rem;
+        width: 100%;
     }
 
     .tab-header {
         flex-direction: column;
         gap: 1rem;
-        align-items: flex-start;
+        align-items: stretch;
+        text-align: center;
+    }
+
+    .tab-header h2 {
+        font-size: 1.25rem;
+        text-align: center;
+        margin-bottom: 0;
+    }
+
+    .tab-header button {
+        width: 100%;
     }
 
     .input-group {
         flex-direction: column;
+        padding: 1rem;
+    }
+
+    .input-group input {
+        width: 100%;
+        font-size: 1rem;
     }
 
     .content-wrapper {
         padding: 1rem;
+    }
+
+    .result-card {
+        padding: 1rem;
+    }
+
+    .welcome-container {
+        padding: 2rem 1rem;
+        margin: 1rem auto;
+    }
+
+    .weather-widget {
+        padding: 1rem;
+    }
+
+    .suggestions {
+        justify-content: center;
+    }
+
+    .stock-suggestions-container {
+        padding: 1rem;
+    }
+
+    .markdown-body {
+        font-size: 1rem;
     }
 }
