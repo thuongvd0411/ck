@@ -499,6 +499,58 @@ async function handleChatSend() {
 
     const loadingId = appendChatLoading();
 
+    // Check for Google Trends Keywords
+    const lowerText = text.toLowerCase();
+    if (lowerText.includes("trend") || lowerText.includes("xu hướng tìm kiếm") || lowerText.includes("google trend")) {
+        // Extract symbol (naive approach: match 3 uppercase letters or any words after "trend")
+        let symbolMatch = text.match(/\b[A-Z]{3}\b/);
+        let symbolStr = symbolMatch ? symbolMatch[0] : "";
+
+        if (!symbolStr) {
+            let words = lowerText.split(/\s+/);
+            let idx = words.findIndex(w => w === "trend" || w === "trends");
+            if (idx !== -1 && idx < words.length - 1) {
+                symbolStr = words[idx + 1].toUpperCase();
+            }
+        }
+
+        if (symbolStr) {
+            try {
+                // Fetch from Local Python Backend
+                const response = await fetch(`http://127.0.0.1:5000/api/trends?symbol=${symbolStr}&months=4`);
+                const trendsData = await response.json();
+
+                if (!response.ok || trendsData.error) {
+                    throw new Error(trendsData.error || "Không thể lấy dữ liệu Trends");
+                }
+
+                // Call Gemini for context insight
+                const prompt = `Dựa vào dữ liệu Google Trends 4 tháng gần nhất của cổ phiếu ${symbolStr}:
+- Chiều hướng: ${trendsData.trend_direction}
+- Từ khóa tìm kiếm tăng mạnh: ${trendsData.rising_keywords.map(k => k.query).join(", ")}
+Hãy viết đúng 3-4 dòng ngắn gọn (bằng tiếng Việt) phân tích mức độ quan tâm của cộng đồng mạng đối với mã cổ phiếu này, có gì bất thường không. Đừng nhắc đến số liệu tuyệt đối.`;
+
+                let aiAnalysis = await callChatGeminiAPI([{ role: "user", parts: [{ text: prompt }] }]);
+
+                document.getElementById(loadingId)?.remove();
+
+                // Append the response
+                chatHistory.push({ role: "model", parts: [{ text: aiAnalysis }] });
+                localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
+
+                // Trực quan hóa lên giao diện
+                appendTrendsMessage(aiAnalysis, trendsData);
+                return;
+
+            } catch (err) {
+                console.error("Trends API Error:", err);
+                document.getElementById(loadingId)?.remove();
+                appendChatMessage(`Xin lỗi, hệ thống lấy dữ liệu Trends hiện đang bận hoặc quá tải do Google Rate Limit. Vui lòng thử lại sau.`, 'bot');
+                return;
+            }
+        }
+    }
+
     const responseText = await callChatGeminiAPI(chatHistory);
 
     document.getElementById(loadingId)?.remove();
@@ -552,6 +604,73 @@ function appendChatMessage(text, sender) {
         contentDiv.innerHTML = marked.parse(text);
     } else {
         contentDiv.innerText = text; // Plain text cho tin nhắn của user
+    }
+
+    msgDiv.appendChild(contentDiv);
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function appendTrendsMessage(text, trendsData) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message bot`;
+
+    const avatarLabel = document.createElement('div');
+    avatarLabel.className = 'message-avatar';
+    avatarLabel.innerText = 'Thư Kí Hoàn Vũ (Trends)';
+    msgDiv.appendChild(avatarLabel);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'message-content markdown-body';
+    contentDiv.innerHTML = marked.parse(text);
+
+    // Create Chart Container
+    if (trendsData && trendsData.interest_data && trendsData.interest_data.length > 0) {
+        const chartWrapper = document.createElement('div');
+        chartWrapper.className = 'trend-chart-container';
+
+        const canvas = document.createElement('canvas');
+        canvas.id = 'trend-chart-' + Date.now();
+        chartWrapper.appendChild(canvas);
+        contentDiv.appendChild(chartWrapper);
+
+        // Chart.js render logic needs to run after element is in DOM
+        setTimeout(() => {
+            const ctx = document.getElementById(canvas.id).getContext('2d');
+            let labels = trendsData.interest_data.map(d => d.date);
+            let values = trendsData.interest_data.map(d => d.value);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Mức độ quan tâm (Google Trends)',
+                        data: values,
+                        borderColor: '#818cf8',
+                        backgroundColor: 'rgba(129, 140, 248, 0.1)',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 4,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: { display: false, min: 0, max: 100 }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: 'rgba(255,255,255,0.7)', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }, 100);
     }
 
     msgDiv.appendChild(contentDiv);
