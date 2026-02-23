@@ -4,6 +4,7 @@ const appContainer = document.getElementById('app-container');
 const apiKeyInput = document.getElementById('api-key-input');
 const saveKeyBtn = document.getElementById('save-key-btn');
 const changeKeyBtn = document.getElementById('change-key-btn');
+const autoRotateKeyBtn = document.getElementById('auto-rotate-key-btn');
 
 const navBtns = document.querySelectorAll('.nav-btn');
 const tabContents = document.querySelectorAll('.tab-content');
@@ -176,6 +177,17 @@ changeKeyBtn.addEventListener('click', () => {
     apiKeyInput.value = userApiKey; // Pre-fill
     init(true); // show modal again
 });
+
+if (autoRotateKeyBtn) {
+    autoRotateKeyBtn.addEventListener('click', () => {
+        // Xóa key cũ của user đi, ép hệ thống dùng key dự phòng và xoay vòng
+        localStorage.removeItem('gemini_api_key');
+        userApiKey = '';
+        currentKeyIndex = (currentKeyIndex + 1) % _k.length;
+        alert("Đã tự động chuyển đổi sang Key hệ thống dự phòng số " + (currentKeyIndex + 1));
+        init(false);
+    });
+}
 
 // Navigation (Tabs)
 navBtns.forEach(btn => {

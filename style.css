@@ -48,6 +48,7 @@ body {
     display: flex;
     flex-direction: row;
     height: 100vh;
+    height: 100dvh;
     width: 100vw;
     overflow: hidden;
 }
@@ -846,7 +847,16 @@ details>div {
     #app-container {
         flex-direction: column;
         height: 100vh;
+        height: 100dvh;
         overflow: hidden;
+    }
+
+    .chat-container {
+        flex: 1;
+        border-radius: 0;
+        /* Vuông vức trên mobile */
+        border: none;
+        border-top: 1px solid var(--glass-border);
     }
 
     .glass-header {
@@ -900,9 +910,10 @@ details>div {
 
     .content-wrapper {
         padding: 15px;
-        height: auto;
         flex: 1;
         overflow-y: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     .chat-header {
