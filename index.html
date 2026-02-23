@@ -36,14 +36,15 @@
     <div id="app-container" class="hidden">
         <header class="glass-header">
             <div class="logo">
-                <span class="gradient-text">AI Chứng Khoán VN</span>
+                <span class="gradient-text">AI Trợ Lý Đầu Tư Cá Nhân</span>
             </div>
-            <nav>
-                <button class="nav-btn active" data-target="welcome-tab">Trang chủ</button>
+            <nav id="main-nav">
+                <button class="nav-btn active" data-target="welcome-tab">Chatbox</button>
+                <button class="nav-btn" data-target="profile-tab">Hồ sơ</button>
+                <button class="nav-btn" data-target="stock-tab">Chấm điểm</button>
+                <button class="nav-btn" data-target="compare-tab">So sánh</button>
+                <button class="nav-btn" data-target="news-tab">Tin tức</button>
                 <button class="nav-btn" data-target="dashboard-tab">Vĩ mô</button>
-                <button class="nav-btn" data-target="news-tab">Quét tin Kinh Tế</button>
-                <button class="nav-btn" data-target="sector-tab">Ngành</button>
-                <button class="nav-btn" data-target="stock-tab">Cổ phiếu</button>
             </nav>
             <button id="change-key-btn" class="secondary-btn">Đổi API Key</button>
         </header>
@@ -55,12 +56,15 @@
                 <p id="loading-text">AI đang phân tích dữ liệu...</p>
             </div>
 
-            <!-- Tab 0: Chatbox (Trang chủ) -->
+            <!-- Tab 0: Chatbox -->
             <section id="welcome-tab" class="tab-content active">
                 <div class="chat-container glass-panel">
                     <div class="chat-header">
-                        <h2>Thư Kí Hoàn Vũ</h2>
-                        <p>Hỏi đáp trực tiếp về thị trường, mã cổ phiếu, kiến thức...</p>
+                        <h2>AI Trợ Lý Đầu Tư Cá Nhân</h2>
+                        <p>Hỏi đáp đa năng, tự động cập nhật hồ sơ qua trò chuyện...</p>
+                        <button id="clear-chat-btn" class="secondary-btn"
+                            style="position: absolute; right: 1rem; top: 1rem; font-size: 0.8rem; padding: 0.3rem 0.6rem;">Xóa
+                            cuộc trò chuyện</button>
                     </div>
                     <div class="chat-messages" id="chat-messages">
                         <!-- Messages go here -->
@@ -76,6 +80,62 @@
                             placeholder="Nhập câu hỏi của bạn... (Enter để gửi, Shift+Enter để xuống dòng)"></textarea>
                         <button id="chat-send-btn" class="primary-btn">Gửi</button>
                     </div>
+                </div>
+            </section>
+
+            <!-- Tab: Hồ sơ nhà đầu tư (NEW) -->
+            <section id="profile-tab" class="tab-content hidden">
+                <div class="tab-header">
+                    <h2>Hồ Sơ Nhà Đầu Tư</h2>
+                    <button id="clear-profile-btn" class="secondary-btn">Xóa bộ nhớ</button>
+                </div>
+                <div class="profile-container glass-panel">
+                    <p class="profile-desc">Hệ thống sẽ ghi nhớ phong cách đầu tư của bạn để đưa ra nhận định cá nhân
+                        hóa nhất. Bạn có thể tự điền ở đây hoặc AI sẽ tự học qua quá trình bạn Chat.</p>
+
+                    <div class="form-group">
+                        <label>Mức chấp nhận rủi ro</label>
+                        <select id="profile-risk">
+                            <option value="">Chưa xác định</option>
+                            <option value="Thấp">Thấp</option>
+                            <option value="Trung bình">Trung bình</option>
+                            <option value="Cao">Cao</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời gian đầu tư</label>
+                        <select id="profile-time">
+                            <option value="">Chưa xác định</option>
+                            <option value="Ngắn hạn">Ngắn hạn (dưới 3 tháng)</option>
+                            <option value="Trung hạn">Trung hạn (3 tháng - 1 năm)</option>
+                            <option value="Dài hạn">Dài hạn (trên 1 năm)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Phong cách ưa thích</label>
+                        <select id="profile-style">
+                            <option value="">Chưa xác định</option>
+                            <option value="Tăng trưởng">Tăng trưởng</option>
+                            <option value="Phòng thủ">Phòng thủ</option>
+                            <option value="Cổ tức">Cổ tức</option>
+                            <option value="Đầu cơ">Đầu cơ lướt sóng</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngành quan tâm (ví dụ: Công nghệ, Ngân hàng)</label>
+                        <input type="text" id="profile-sectors" placeholder="Ngành quan tâm...">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Cổ phiếu đang nắm giữ (ví dụ: FPT, HPG)</label>
+                        <input type="text" id="profile-holdings" placeholder="Mã cổ phiếu...">
+                    </div>
+
+                    <button id="save-profile-btn" class="primary-btn" style="width: 100%; margin-top: 1rem;">Lưu hồ
+                        sơ</button>
                 </div>
             </section>
 
@@ -104,35 +164,14 @@
                 </div>
             </section>
 
-            <!-- Tab 2: Phân tích Ngành -->
-            <section id="sector-tab" class="tab-content hidden">
-                <div class="tab-header">
-                    <h2>Phân Tích Nhóm Ngành (1-3 Tháng)</h2>
-                </div>
-                <div class="suggestions" id="sector-suggestions">
-                    <span>Gợi ý:</span>
-                    <button class="suggestion-btn glass-panel">Ngân hàng</button>
-                    <button class="suggestion-btn glass-panel">Chứng khoán</button>
-                    <button class="suggestion-btn glass-panel">Bất động sản</button>
-                    <button class="suggestion-btn glass-panel">Thép</button>
-                    <button class="suggestion-btn glass-panel">Bán lẻ</button>
-                    <button class="suggestion-btn glass-panel">Đầu tư công</button>
-                </div>
-                <div class="input-group glass-panel">
-                    <input type="text" id="sector-input" placeholder="Nhập tên ngành (Ví dụ: Dầu khí, Phân bón...)">
-                    <button id="analyze-sector-btn" class="primary-btn">Phân tích</button>
-                </div>
-                <div id="sector-result" class="result-card glass-panel markdown-body hidden"></div>
-            </section>
-
-            <!-- Tab 3: Phân tích Cổ phiếu -->
+            <!-- Tab 3: Chấm điểm Cổ phiếu (Cũ là Phân tích Cổ phiếu) -->
             <section id="stock-tab" class="tab-content hidden">
                 <div class="tab-header">
-                    <h2>Phân Tích Vị Thế Cổ Phiếu</h2>
+                    <h2>Chấm Điểm Cổ Phiếu Dựa Trên Hồ Sơ</h2>
                 </div>
                 <div class="stock-suggestions-container glass-panel">
                     <div class="suggestions" id="stock-sector-suggestions">
-                        <span>Chọn nhóm ngành:</span>
+                        <span>Gợi ý ngành:</span>
                         <button class="suggestion-btn stock-sector-btn">Ngân hàng</button>
                         <button class="suggestion-btn stock-sector-btn">Chứng khoán</button>
                         <button class="suggestion-btn stock-sector-btn">Bất động sản</button>
@@ -148,10 +187,27 @@
                     </div>
                 </div>
                 <div class="input-group glass-panel">
-                    <input type="text" id="stock-input" placeholder="Nhập mã chữ cái (Ví dụ: HPG, SSI, VCB...)">
-                    <button id="analyze-stock-btn" class="primary-btn">Phân tích</button>
+                    <input type="text" id="stock-input" placeholder="Nhập 1 mã chữ cái (Ví dụ: FPT)">
+                    <button id="analyze-stock-btn" class="primary-btn">Chấm điểm</button>
                 </div>
                 <div id="stock-result" class="result-card glass-panel markdown-body hidden"></div>
+            </section>
+
+            <!-- Tab 4: So Sánh 2 Cổ Phiếu (NEW) -->
+            <section id="compare-tab" class="tab-content hidden">
+                <div class="tab-header">
+                    <h2>So Sánh 2 Cổ Phiếu Cho Hồ Sơ Của Bạn</h2>
+                </div>
+                <div class="input-group glass-panel" style="gap: 0.5rem; flex-wrap: wrap;">
+                    <input type="text" id="compare-stock-1" placeholder="Mã số 1 (Ví dụ: SSI)"
+                        style="flex: 1; min-width: 120px;">
+                    <span
+                        style="display:flex; align-items:center; color: var(--text-secondary); font-weight: bold;">VS</span>
+                    <input type="text" id="compare-stock-2" placeholder="Mã số 2 (Ví dụ: VND)"
+                        style="flex: 1; min-width: 120px;">
+                    <button id="compare-stock-btn" class="primary-btn">So sánh</button>
+                </div>
+                <div id="compare-result" class="result-card glass-panel markdown-body hidden"></div>
             </section>
         </main>
     </div>

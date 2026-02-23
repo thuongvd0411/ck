@@ -15,11 +15,22 @@ const loadingText = document.getElementById('loading-text');
 const chatMessages = document.getElementById('chat-messages');
 const chatInput = document.getElementById('chat-input');
 const chatSendBtn = document.getElementById('chat-send-btn');
+const clearChatBtn = document.getElementById('clear-chat-btn');
 
-let chatHistory = [
+// Profile Elements
+const profileRisk = document.getElementById('profile-risk');
+const profileTime = document.getElementById('profile-time');
+const profileStyle = document.getElementById('profile-style');
+const profileSectors = document.getElementById('profile-sectors');
+const profileHoldings = document.getElementById('profile-holdings');
+const saveProfileBtn = document.getElementById('save-profile-btn');
+const clearProfileBtn = document.getElementById('clear-profile-btn');
+
+// State Management: Chat History
+let chatHistory = JSON.parse(localStorage.getItem('ai_stock_chat_history')) || [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai Thư Kí Hoàn Vũ, một thư ký AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Khi được hỏi bạn là ai, hãy trả lời bạn là Thư Kí Hoàn Vũ. Trả lời các câu hỏi ngắn gọn, súc tích, logic và dễ hiểu." }],
+        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
     },
     {
         role: "model",
@@ -27,7 +38,16 @@ let chatHistory = [
     }
 ];
 
-let hasInitializedGreeting = false;
+// State Management: User Profile
+let userProfile = JSON.parse(localStorage.getItem('ai_stock_user_profile')) || {
+    risk: "",
+    time: "",
+    style: "",
+    sectors: "",
+    holdings: ""
+};
+
+let hasInitializedGreeting = localStorage.getItem('has_initialized_greeting') === 'true';
 // Dashboard Elements
 const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
 const dashboardResult = document.getElementById('dashboard-result');
@@ -81,13 +101,63 @@ function init(forceStart = false) {
     } else {
         apiKeyModal.classList.add('hidden');
         appContainer.classList.remove('hidden');
+
+        loadProfileToUI();
         loadDashboard(); // Load dashboard cache if available
 
         if (!hasInitializedGreeting) {
             initChatGreeting();
             hasInitializedGreeting = true;
+            localStorage.setItem('has_initialized_greeting', 'true');
+        } else {
+            // Restore chat history UI on load
+            restoreChatUI();
         }
     }
+}
+
+function loadProfileToUI() {
+    profileRisk.value = userProfile.risk;
+    profileTime.value = userProfile.time;
+    profileStyle.value = userProfile.style;
+    profileSectors.value = userProfile.sectors;
+    profileHoldings.value = userProfile.holdings;
+}
+
+function saveProfileFromUI() {
+    userProfile = {
+        risk: profileRisk.value,
+        time: profileTime.value,
+        style: profileStyle.value,
+        sectors: profileSectors.value.trim(),
+        holdings: profileHoldings.value.trim()
+    };
+    localStorage.setItem('ai_stock_user_profile', JSON.stringify(userProfile));
+    alert('Đã lưu hồ sơ đầu tư!');
+}
+
+function getProfileSummary() {
+    let summary = "Hồ sơ Nhà Đầu Tư hiện tại:\n";
+    summary += `- Mức rủi ro: ${userProfile.risk || 'Chưa rõ'}\n`;
+    summary += `- Thời gian ĐT: ${userProfile.time || 'Chưa rõ'}\n`;
+    summary += `- Phong cách: ${userProfile.style || 'Chưa rõ'}\n`;
+    summary += `- Ngành quan tâm: ${userProfile.sectors || 'Chưa rõ'}\n`;
+    summary += `- Cổ phiếu đang giữ: ${userProfile.holdings || 'Chưa rõ'}\n`;
+    return summary;
+}
+
+function restoreChatUI() {
+    chatMessages.innerHTML = '';
+    // Skip the first 2 static prompt messages
+    for (let i = 2; i < chatHistory.length; i++) {
+        const msg = chatHistory[i];
+        if (msg.role === 'user') {
+            appendChatMessage(msg.parts[0].text, 'user', true);
+        } else {
+            appendChatMessage(msg.parts[0].text, 'bot', true);
+        }
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
 // === Event Listeners ===
@@ -130,6 +200,39 @@ navBtns.forEach(btn => {
         const targetId = btn.getAttribute('data-target');
         document.getElementById(targetId).classList.remove('hidden');
     });
+});
+
+// Profile Management
+saveProfileBtn.addEventListener('click', saveProfileFromUI);
+
+clearProfileBtn.addEventListener('click', () => {
+    if (confirm("Bạn có chắc muốn xóa toàn bộ hồ sơ nhà đầu tư?")) {
+        userProfile = { risk: "", time: "", style: "", sectors: "", holdings: "" };
+        localStorage.removeItem('ai_stock_user_profile');
+        loadProfileToUI();
+        alert('Đã xóa hồ sơ.');
+    }
+});
+
+// Chat Management
+clearChatBtn.addEventListener('click', () => {
+    if (confirm("Bạn có chắc muốn xóa lịch sử trò chuyện?")) {
+        chatHistory = [
+            {
+                role: "user",
+                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
+            },
+            {
+                role: "model",
+                parts: [{ text: "Đã hiểu." }]
+            }
+        ];
+        localStorage.removeItem('ai_stock_chat_history');
+        localStorage.removeItem('has_initialized_greeting');
+        hasInitializedGreeting = false;
+        chatMessages.innerHTML = '';
+        initChatGreeting();
+    }
 });
 
 // Feature Triggers
@@ -226,8 +329,23 @@ stockInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') analyzeStockBtn.click();
 });
 
+// Compare Elements
+const compareStock1 = document.getElementById('compare-stock-1');
+const compareStock2 = document.getElementById('compare-stock-2');
+const compareStockBtn = document.getElementById('compare-stock-btn');
+const compareResult = document.getElementById('compare-result');
 
-// === Core Gemini API Function ===
+compareStockBtn.addEventListener('click', () => {
+    const s1 = compareStock1.value.trim().toUpperCase();
+    const s2 = compareStock2.value.trim().toUpperCase();
+    if (s1 && s2) {
+        analyzeCompare(s1, s2);
+    } else {
+        alert('Vui lòng nhập đủ 2 mã cổ phiếu.');
+    }
+});
+
+// Profile Management
 async function callGeminiAPI(promptText, isRetry = false) {
     const apiKey = getActiveKey();
     if (!apiKey) {
@@ -346,6 +464,7 @@ Bao gồm đủ các ý sau nhưng viết GỌN GÀNG, TỰ NHIÊN, hiện đạ
 
         if (responseText) {
             chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+            localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
             appendChatMessage(responseText, 'bot');
         } else {
             fallbackGreeting();
@@ -360,6 +479,7 @@ Bao gồm đủ các ý sau nhưng viết GỌN GÀNG, TỰ NHIÊN, hiện đạ
 function fallbackGreeting() {
     const text = "Xin chào **Thưởng Vương Đức**! Chúc bạn một ngày đầu tư thành công. Tôi có thể phân tích cổ phiếu hay vĩ mô gì cho bạn hôm nay?";
     chatHistory.push({ role: "model", parts: [{ text }] });
+    localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
     appendChatMessage(text, 'bot');
 }
 
@@ -372,6 +492,7 @@ async function handleChatSend() {
     chatInput.style.height = 'auto';
 
     chatHistory.push({ role: "user", parts: [{ text }] });
+    localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
 
     const loadingId = appendChatLoading();
 
@@ -380,11 +501,36 @@ async function handleChatSend() {
     document.getElementById(loadingId)?.remove();
 
     if (responseText) {
-        chatHistory.push({ role: "model", parts: [{ text: responseText }] });
-        appendChatMessage(responseText, 'bot');
+        // Detect auto-profile learning in response (Looking for ```json ... ```)
+        let finalResponse = responseText;
+        const jsonMatch = responseText.match(/```json\n([\s\S]*?)\n```/);
+
+        if (jsonMatch && jsonMatch[1]) {
+            try {
+                const parsedProfile = JSON.parse(jsonMatch[1]);
+                if (parsedProfile.risk) userProfile.risk = parsedProfile.risk;
+                if (parsedProfile.time) userProfile.time = parsedProfile.time;
+                if (parsedProfile.style) userProfile.style = parsedProfile.style;
+                if (parsedProfile.sectors) userProfile.sectors = parsedProfile.sectors;
+                if (parsedProfile.holdings) userProfile.holdings = parsedProfile.holdings;
+
+                localStorage.setItem('ai_stock_user_profile', JSON.stringify(userProfile));
+                loadProfileToUI();
+
+                // Remove the json block from the visible response
+                finalResponse = responseText.replace(/```json\n[\s\S]*?\n```/, '').trim();
+            } catch (e) {
+                console.error("Failed to parse auto-profile json update.", e);
+            }
+        }
+
+        chatHistory.push({ role: "model", parts: [{ text: finalResponse }] });
+        localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
+        appendChatMessage(finalResponse, 'bot');
     } else {
         appendChatMessage("Xin lỗi, đã có lỗi xảy ra. Hãy kiểm tra kết nối và thử lại.", 'bot');
         chatHistory.pop(); // Revert user message from history on fail
+        localStorage.setItem('ai_stock_chat_history', JSON.stringify(chatHistory));
     }
 }
 
@@ -433,13 +579,38 @@ function appendChatLoading() {
     return id;
 }
 
-async function callChatGeminiAPI(history, isRetry = false) {
+async function callChatGeminiAPI(fullHistory, isRetry = false) {
     const apiKey = getActiveKey();
     if (!apiKey) {
         alert("Thiếu API Key!");
         init();
         return null;
     }
+
+    // --- Token Optimization Logic ---
+    // Rule: Send System Prompt + Profile Summary + Last 5 messages only.
+    let optimizedHistory = [];
+
+    // Always keep the original System prompts (first 2 messages)
+    if (fullHistory.length >= 2) {
+        optimizedHistory.push(fullHistory[0]);
+        optimizedHistory.push(fullHistory[1]);
+    }
+
+    // Inject dynamic User Profile info as a hidden system instruction
+    const profileSummaryMsg = {
+        role: "user",
+        parts: [{ text: `[SYSTEM INSTRUCTION: ${getProfileSummary()}\nHãy dựa vào hồ sơ này để cá nhân hóa phân tích. NẾU người dùng thay đổi hoặc cung cấp thêm góc nhìn (ví dụ: tôi đổi sang thích an toàn, tôi mới mua FPT...), HÃY xuất ra MỘT khối JSON ở CUỐI CÙNG tin nhắn với định dạng: \`\`\`json\n{ "risk": "Thấp/Trung bình/Cao", "time": "Ngắn/Trung/Dài hạn", "style": "Tăng trưởng/Phòng thủ/Cổ tức/Đầu cơ", "sectors": "...", "holdings": "..." }\n\`\`\` NẾU KHÔNG CẬP NHẬT GÌ thì KHÔNG ghi JSON.]` }]
+    };
+    optimizedHistory.push(profileSummaryMsg);
+    optimizedHistory.push({ role: "model", parts: [{ text: "Đã rõ." }] });
+
+    // Grab up to the last 5 messages from the actual conversation history
+    const recentMessagesCount = 5;
+    const conversationPart = fullHistory.slice(2); // Skip the first 2 static sys prompts
+    let recentMessages = conversationPart.slice(-recentMessagesCount);
+
+    optimizedHistory = optimizedHistory.concat(recentMessages);
 
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -448,7 +619,7 @@ async function callChatGeminiAPI(history, isRetry = false) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: history,
+                contents: optimizedHistory,
                 generationConfig: {
                     temperature: 0.7,
                 }
@@ -459,7 +630,7 @@ async function callChatGeminiAPI(history, isRetry = false) {
             if (response.status === 429) {
                 if (!isRetry && rotateKey()) {
                     console.log("Hết quota, thử lại chat với key mới...");
-                    return await callChatGeminiAPI(history, true);
+                    return await callChatGeminiAPI(fullHistory, true);
                 }
             }
             const errorData = await response.json();
@@ -684,45 +855,55 @@ Phân tích logic, không cảm tính.`;
 }
 
 async function analyzeStock(ticker) {
-    const prompt = `Bạn là giáo sư kinh tế chuyên phân tích chu kỳ thị trường Việt Nam kết hợp phân tích ngành và cổ phiếu.
+    const profileText = getProfileSummary();
+    const prompt = `Bạn là AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam.
+Người dùng đang yêu cầu ĐÁNH GIÁ & CHẤM ĐIỂM cổ phiếu: ${ticker}.
 
-Hãy thực hiện phân tích cổ phiếu mã "${ticker}" trong khung 1–3 tháng tới theo yêu cầu sau (viết bằng Markdown):
+THÔNG TIN NHÀ ĐẦU TƯ:
+${profileText}
 
-1. VỊ THẾ CỔ PHIẾU TRONG CHU KỲ VĨ MÔ
-- Ngành của cổ phiếu đang hưởng lợi hay chịu áp lực?
-- Mức độ nhạy cảm với thanh khoản thị trường?
-- Có phù hợp môi trường tiền tệ hiện tại không?
+YÊU CẦU PHÂN TÍCH (trình bày bằng Markdown dễ nhìn):
+1. Tóm tắt doanh nghiệp (cực kỳ ngắn gọn).
+2. Phân tích cơ bản & Tài chính hiện tại.
+3. Phân tích triển vọng ngành.
+4. Đánh giá định giá (Rẻ, Hợp lý hay Đắt).
+5. CHẤM ĐIỂM CỔ PHIẾU: Đưa ra điểm số khách quan trên thang 100 điểm. Hãy in đậm dòng này (Ví dụ: **Điểm đánh giá tổng thể: 75/100**).
+6. NHẬN ĐỊNH SỰ PHÙ HỢP: Dựa vào hồ sơ nhà đầu tư (mức rủi ro, thời gian, phong cách), hãy đưa ra lời khuyên cụ thể.
+NẾU cổ phiếu có rủi ro cao (hoặc tính đầu cơ mạnh) mà nhà đầu tư thuộc nhóm an toàn/rủi ro thấp, BẮT BUỘC có dòng CẢNH BÁO in đậm chặn đầu.
 
-2. ĐÁNH GIÁ CỔ PHIẾU
-- Lợi thế cạnh tranh
-- Yếu tố có thể kích hoạt sóng 1–3 tháng
-- Cổ phiếu này phù hợp đầu tư trung hạn hay trading ngắn hạn?
-
-3. ĐÁNH GIÁ XÁC SUẤT TÍCH CỰC (Điểm từ 1–5)
-Hãy giải thích vì sao đưa ra điểm số này.
-
-4. KỊCH BẢN DIỄN BIẾN
-- Kịch bản tích cực
-- Kịch bản trung tính
-- Kịch bản tiêu cực
-
-5. CHIẾN LƯỢC TIẾP CẬN VÀ RỦI RO
-- Rủi ro lớn nhất là gì?
-- Nên chờ tín hiệu gì để xác nhận xu hướng?
-
-6. TỰ PHẢN BIỆN
-- Giả định nào trong phân tích này có thể sai?
-- Tín hiệu thị trường nào sẽ phủ định các nhận định trên?
-
-YÊU CẦU ĐẶC BIỆT: 
-- Nếu ${ticker} là một cổ phiếu lớn có thị giá phổ biến trên 60.000 VND (Ví dụ: VCB, FPT, MWG, SAB, VNM...), hãy BẮT BUỘC in đậm một dòng CẢNH BÁO ở ngay đầu bài phân tích: "> **CẢNH BÁO: Cổ phiếu này có thị giá > 60.000 VND, không phù hợp với tiêu chí lọc giá <= 60.000 VND của hệ thống.**" (Dùng blockquote của Markdown). Sau đó vẫn tiến hành phân tích bình thường.
-- Phân tích logic, không cảm tính. Nhấn mạnh xác suất.`;
+Tính khách quan, logic, không hô hào.`;
 
     const resultMarkdown = await callGeminiAPI(prompt);
 
     if (resultMarkdown) {
         stockResult.innerHTML = marked.parse(resultMarkdown);
         stockResult.classList.remove('hidden');
+    }
+}
+
+async function analyzeCompare(ticker1, ticker2) {
+    const profileText = getProfileSummary();
+    const prompt = `Bạn là AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam.
+Người dùng đang yêu cầu SO SÁNH 2 cổ phiếu: ${ticker1} và ${ticker2}.
+
+THÔNG TIN NHÀ ĐẦU TƯ:
+${profileText}
+
+YÊU CẦU KẾT QUẢ (sử dụng Markdown Format):
+Hãy tạo một Bảng so sánh (Markdown Table) chi tiết giữa 2 cổ phiếu về các tiêu chí: 
+- Tăng trưởng
+- Hiệu quả hoạt động
+- Sức khỏe tài chính
+- Tình trạng định giá
+- Điểm tổng (Chấm trên thang 10 điểm hoặc 100 điểm cho mỗi mã)
+
+Sau bảng so sánh, hãy viết một đoạn "Đánh giá phù hợp với hồ sơ của bạn". Gợi ý cho người dùng xem mã nào (hoặc không mã nào) phù hợp hơn với sở thích, mức rủi ro và thời gian đầu tư của họ. Khách quan và logic.`;
+
+    const resultMarkdown = await callGeminiAPI(prompt);
+
+    if (resultMarkdown) {
+        compareResult.innerHTML = marked.parse(resultMarkdown);
+        compareResult.classList.remove('hidden');
     }
 }
 
