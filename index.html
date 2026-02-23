@@ -62,12 +62,10 @@
                     <div class="chat-header">
                         <h2>AI Trợ Lý Đầu Tư Cá Nhân</h2>
                         <p>Hỏi đáp đa năng, tự động cập nhật hồ sơ qua trò chuyện...</p>
-                        <button id="load-history-btn" class="secondary-btn"
-                            style="position: absolute; right: 10rem; top: 1rem; font-size: 0.8rem; padding: 0.3rem 0.6rem;">Lịch
-                            sử</button>
-                        <button id="clear-chat-btn" class="secondary-btn"
-                            style="position: absolute; right: 1rem; top: 1rem; font-size: 0.8rem; padding: 0.3rem 0.6rem;">Xóa
-                            cuộc trò chuyện</button>
+                        <div class="chat-actions">
+                            <button id="load-history-btn" class="secondary-btn hidden">Lịch sử cũ</button>
+                            <button id="clear-chat-btn" class="secondary-btn">Xóa trò chuyện</button>
+                        </div>
                     </div>
                     <div class="chat-messages" id="chat-messages">
                         <!-- Messages go here -->

@@ -463,7 +463,7 @@ Nhiệt độ Hà Nội hiện tại: ${temp}°C. ${willRain}.
 Dự báo 4h tới: Nhiệt độ khoảng ${Math.round(next4HoursTemps.reduce((a, b) => a + b) / next4HoursTemps.length)}°C.
 
 Hãy viết ĐÚNG 1 CÂU chào mừng tham khảo cấu trúc ví dụ dưới đây (chỉ thay đổi thời gian buổi nào, giờ, nhiệt độ, thời tiết cho đúng với hiện tại. Viết tự nhiên, súc tích, KHÔNG THÊM BẤT KỲ câu hỏi nào ở cuối.):
-Ví dụ: "Xin chào buổi trưa anh Thưởng Vương Đức, giờ là 13h, Hà Nội hiện có nhiệt độ 21 độ C, anh có thể mặc áo khoác mỏng và tận hưởng không khí mát mẻ. Dự kiến 4h tới không mưa, nhiệt độ là 23 độ C. chúc anh 1 ngày đầu tư thành công."`;
+Ví dụ: "Xin chào buổi trưa anh **Thưởng Vương Đức**, giờ là 13h, Hà Nội hiện có nhiệt độ 21 độ C, anh có thể mặc áo khoác mỏng và tận hưởng không khí mát mẻ. Dự kiến 4h tới không mưa, nhiệt độ là 23 độ C. chúc anh 1 ngày đầu tư thành công."`;
 
         const responseText = await callChatGeminiAPI([{ role: "user", parts: [{ text: greetingPrompt }] }]);
 

@@ -399,6 +399,21 @@ nav {
     padding: 1.5rem;
     border-bottom: 1px solid var(--glass-border);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.chat-actions .secondary-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
 }
 
 .chat-header h2 {
@@ -431,8 +446,22 @@ nav {
 
 .message {
     display: flex;
-    max-width: 85%;
+    flex-direction: column;
+    max-width: 92%;
     animation: fadeIn 0.3s ease-out;
+}
+
+.message-avatar {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.3rem;
+    margin-left: 0.2rem;
+    opacity: 0.8;
+}
+
+.message.user .message-avatar {
+    align-self: flex-end;
+    margin-right: 0.2rem;
 }
 
 .message.user {
@@ -776,11 +805,16 @@ details>div {
     }
 
     .chat-messages {
-        padding: 1rem;
+        padding: 0.8rem;
+        gap: 1rem;
+    }
+
+    .message {
+        max-width: 95%;
     }
 
     .message-content {
-        padding: 0.7rem 1rem;
+        padding: 0.6rem 0.8rem;
         font-size: 0.95rem;
     }
 
