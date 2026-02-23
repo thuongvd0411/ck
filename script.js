@@ -97,10 +97,8 @@ function init(forceModal = false) {
         loadProfileToUI();
         loadDashboard(); // Load dashboard cache if available
 
-        if (!hasInitializedGreeting || chatHistory.length <= 2) {
+        if (chatHistory.length <= 2) {
             initChatGreeting();
-            hasInitializedGreeting = true;
-            localStorage.setItem('has_initialized_greeting', 'true');
         } else {
             // Restore chat history UI on load
             restoreChatUI();
@@ -214,19 +212,16 @@ clearProfileBtn.addEventListener('click', () => {
 });
 
 // Chat Management
-const clearAllDataBtn = document.createElement('button');
-clearAllDataBtn.className = 'secondary-btn';
-clearAllDataBtn.style.borderColor = 'red';
-clearAllDataBtn.style.color = '#ff4d4d';
-clearAllDataBtn.innerText = 'Xóa toàn bộ dữ liệu App';
-clearAllDataBtn.addEventListener('click', () => {
-    if (confirm("⚠️ CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu bao gồm Lịch sử Chat, Hồ sơ nhà đầu tư, Key API và các bộ nhớ đệm khác. \n\nBạn có chắc chắn muốn tiếp tục?")) {
-        localStorage.clear();
-        alert('Đã xóa sạch ứng dụng. Trang sẽ tải lại ngay bây giờ.');
-        window.location.reload();
-    }
-});
-document.querySelector('#welcome-tab .tab-header').appendChild(clearAllDataBtn);
+const headerClearDataBtn = document.getElementById('header-clear-data-btn');
+if (headerClearDataBtn) {
+    headerClearDataBtn.addEventListener('click', () => {
+        if (confirm("⚠️ CẢNH BÁO: Hành động này sẽ xóa TOÀN BỘ dữ liệu bao gồm Lịch sử Chat, Hồ sơ, Key API. \n\nBạn có chắc chắn muốn tiếp tục?")) {
+            localStorage.clear();
+            alert('Đã xóa sạch ứng dụng. Trang sẽ tải lại ngay bây giờ.');
+            window.location.reload();
+        }
+    });
+}
 
 clearChatBtn.addEventListener('click', () => {
     if (confirm("Bạn có chắc muốn xóa lịch sử trò chuyện?")) {
@@ -241,8 +236,6 @@ clearChatBtn.addEventListener('click', () => {
             }
         ];
         localStorage.removeItem('ai_stock_chat_history');
-        localStorage.removeItem('has_initialized_greeting');
-        hasInitializedGreeting = false;
         chatMessages.innerHTML = '';
         initChatGreeting();
     }
@@ -553,11 +546,12 @@ function appendChatMessage(text, sender, isRestoring = false) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}`;
 
-    // Add avatar label
-    const avatarLabel = document.createElement('div');
-    avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = sender === 'bot' ? 'Thư Kí Hoàn Vũ' : 'Anh';
-    msgDiv.appendChild(avatarLabel);
+    if (sender === 'bot') {
+        const avatarLabel = document.createElement('div');
+        avatarLabel.className = 'message-avatar';
+        avatarLabel.innerText = 'Thư Kí Hoàn Vũ';
+        msgDiv.appendChild(avatarLabel);
+    }
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content markdown-body';
@@ -565,36 +559,11 @@ function appendChatMessage(text, sender, isRestoring = false) {
     if (sender === 'bot') {
         contentDiv.innerHTML = marked.parse(text);
     } else {
-        contentDiv.innerText = text; // Plain text cho tin nhắn của user
+        contentDiv.innerText = text;
     }
 
     msgDiv.appendChild(contentDiv);
-
-    // Add "Read more" mechanics for collapsible content
-    const toggleBtn = document.createElement('button');
-    toggleBtn.className = 'read-more-btn';
-    toggleBtn.innerText = 'Xem thêm...';
-
-    msgDiv.appendChild(toggleBtn);
     chatMessages.appendChild(msgDiv);
-
-    // Wait briefly for CSS to render, then check height
-    setTimeout(() => {
-        if (contentDiv.scrollHeight > 250) {
-            toggleBtn.classList.add('visible');
-            toggleBtn.addEventListener('click', () => {
-                if (contentDiv.classList.contains('expanded')) {
-                    contentDiv.classList.remove('expanded');
-                    toggleBtn.innerText = 'Xem thêm...';
-                    // Scroll back up to the message start
-                    msgDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else {
-                    contentDiv.classList.add('expanded');
-                    toggleBtn.innerText = 'Thu gọn';
-                }
-            });
-        }
-    }, 50);
 
     if (!isRestoring) {
         chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -614,7 +583,7 @@ function appendChatLoading() {
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = '<span class="skeleton-text">Phân tích thông tin...</span>';
+    contentDiv.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
     msgDiv.appendChild(contentDiv);
 
     chatMessages.appendChild(msgDiv);
@@ -913,7 +882,7 @@ YÊU CẦU PHÂN TÍCH (trình bày bằng Markdown dễ nhìn):
 2. Phân tích cơ bản & Tài chính hiện tại.
 3. Phân tích triển vọng ngành.
 4. Đánh giá định giá (Rẻ, Hợp lý hay Đắt).
-5. CHẤM ĐIỂM CỔ PHIẾU: Đưa ra điểm số khách quan trên thang 100 điểm. Hãy in đậm dòng này (Ví dụ: **Điểm đánh giá tổng thể: 75/100**).
+5. CHẤM ĐIỂM CỔ PHIẾU: Đưa ra điểm số theo MỨC ĐỘ PHÙ HỢP trên thang 100 điểm. Để hiển thị thanh tiến trình 100%, bạn BẮT BUỘC phải chèn cú pháp chính xác là [SCORE:X] vào cuối cùng mục này, trong đó X là số điểm (Ví dụ: [SCORE:75]).
 6. NHẬN ĐỊNH SỰ PHÙ HỢP: Dựa vào hồ sơ nhà đầu tư (mức rủi ro, thời gian, phong cách), hãy đưa ra lời khuyên cụ thể.
 NẾU cổ phiếu có rủi ro cao (hoặc tính đầu cơ mạnh) mà nhà đầu tư thuộc nhóm an toàn/rủi ro thấp, BẮT BUỘC có dòng CẢNH BÁO in đậm chặn đầu.
 
@@ -922,7 +891,9 @@ Tính khách quan, logic, không hô hào.`;
     const resultMarkdown = await callGeminiAPI(prompt);
 
     if (resultMarkdown) {
-        stockResult.innerHTML = marked.parse(resultMarkdown);
+        // Regex to find [SCORE:XX] and replace it with HTML
+        let finalMd = resultMarkdown.replace(/\[SCORE:\s*(\d+)\]/g, '<div class="point-score">$1/100</div><div class="score-progress-bg"><div class="score-progress-fill" style="width: $1%"></div></div>');
+        stockResult.innerHTML = marked.parse(finalMd);
         stockResult.classList.remove('hidden');
     }
 }

@@ -34,19 +34,21 @@
 
     <!-- Main App -->
     <div id="app-container" class="hidden">
-        <header class="glass-header">
+        <header class="minimal-header">
             <div class="logo">
-                <span class="gradient-text">AI Trợ Lý Đầu Tư Cá Nhân</span>
+                <span class="gradient-text">AI Trợ Lý Đầu Tư</span>
             </div>
             <nav id="main-nav">
                 <button class="nav-btn active" data-target="welcome-tab">Chatbox</button>
-                <button class="nav-btn" data-target="profile-tab">Hồ sơ</button>
                 <button class="nav-btn" data-target="stock-tab">Chấm điểm</button>
                 <button class="nav-btn" data-target="compare-tab">So sánh</button>
                 <button class="nav-btn" data-target="news-tab">Tin tức</button>
                 <button class="nav-btn" data-target="dashboard-tab">Vĩ mô</button>
             </nav>
-            <button id="change-key-btn" class="secondary-btn">Đổi API Key</button>
+            <div class="header-actions">
+                <button class="nav-btn" id="header-profile-btn" data-target="profile-tab">Hồ sơ</button>
+                <button id="header-clear-data-btn" class="danger-btn">Xóa All</button>
+            </div>
         </header>
 
         <main class="content-wrapper">
@@ -59,20 +61,21 @@
             <!-- Tab 0: Chatbox -->
             <section id="welcome-tab" class="tab-content active">
                 <div class="chat-container glass-panel">
-                    <div class="chat-header">
-                        <h2>AI Trợ Lý Đầu Tư Cá Nhân</h2>
-                        <p>Hỏi đáp đa năng, tự động cập nhật hồ sơ qua trò chuyện...</p>
-                        <button id="clear-chat-btn" class="secondary-btn"
-                            style="position: absolute; right: 1rem; top: 1rem; font-size: 0.8rem; padding: 0.3rem 0.6rem;">Xóa
-                            cuộc trò chuyện</button>
+                    <div class="chat-header hidden">
+                        <!-- Removed visible chat header for minimalist look -->
                     </div>
                     <div class="chat-messages" id="chat-messages">
                         <!-- Messages go here -->
                     </div>
                     <div class="chat-input-area">
-                        <textarea id="chat-input"
-                            placeholder="Nhập câu hỏi của bạn... (Enter để gửi, Shift+Enter để xuống dòng)"></textarea>
-                        <button id="chat-send-btn" class="primary-btn">Gửi</button>
+                        <textarea id="chat-input" placeholder="Nhập câu hỏi..."></textarea>
+                        <button id="chat-send-btn" class="icon-btn" aria-label="Gửi">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </section>
