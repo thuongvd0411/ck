@@ -12,7 +12,14 @@ CACHE_TTL = 3 * 3600  # 3 hours in seconds
 
 def get_pytrends_data(kw_list, timeframe):
     """Lấy dữ liệu từ Google Trends, có retry để giảm thiểu lỗi Rate Limit (429)"""
-    pytrends = TrendReq(hl='vi-VN', tz=-420) # Múi giờ VN
+    # Sử dụng User-Agent phổ biến để tránh bị Google chặn ngay lập tức trên Vercel
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'application/json, text/plain, */*',
+        'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
+    }
+    
+    pytrends = TrendReq(hl='vi-VN', tz=-420, requests_args={'headers': headers}) # Múi giờ VN
     
     # Retry mechanism
     max_retries = 3
@@ -28,7 +35,8 @@ def get_pytrends_data(kw_list, timeframe):
             
             if "429" in msg or "Rate Limit" in msg:
                 if attempt < max_retries - 1:
-                    time.sleep((attempt + 1) * 2) # Backoff
+                    # Chờ lâu hơn một chút (3s -> 6s)
+                    time.sleep((attempt + 1) * 3) 
                 else:
                     raise Exception("Google Trends đang chặn kết nối (Rate Limit). Vui lòng thử lại sau vài giờ.")
             else:
