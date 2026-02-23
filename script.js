@@ -72,10 +72,7 @@ const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions
 
 // === State Management ===
 const _k = [
-    "QUl6YVN5QmVLbGllMEk3LWFkNm1tTWxlOVVlRUo4UDFUS3ZaMFdz",
-    "QUl6YVN5QzNLS2J6T2dsS2NaNktFV3lBUzlwWC1VaThxSVA1Zk5N",
-    "QUl6YVN5RHVLS2VVVWJEcDVSbk9ObXFITS1jbEprM1Q1QUJrakVN",
-    "QUl6YVN5QWZoT0hxNngtUEd6cVU3VkNnT2xYUjF0WEFzRnc4LVdj"
+    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB"
 ];
 let currentKeyIndex = 0;
 let userApiKey = localStorage.getItem('gemini_api_key') || '';
