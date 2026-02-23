@@ -68,7 +68,10 @@ const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions
 
 // === State Management ===
 const _k = [
-    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB"
+    "QUl6YVN5QVVubThsVV9ramF1eWpCb3R4bTBFcks3V3BGMW1GSXhB",
+    "QUl6YVN5QkdKTlN3QmNJWExwc3dOOTVGS0R1eGR3d2xlUHl0cjlB",
+    "QUl6YVN5RFdOeUV3ejNieHlUSU9PUUhSUVJ3SGF4UnY5NlgxVnpj",
+    "QUl6YVN5QUs1LVZVblpORXQ1aUhHMGJYd1A4ZGd2aDRPczM2N2VN"
 ];
 let currentKeyIndex = 0;
 let userApiKey = localStorage.getItem('gemini_api_key') || '';
@@ -346,7 +349,7 @@ compareStockBtn.addEventListener('click', () => {
 });
 
 // Profile Management
-async function callGeminiAPI(promptText, isRetry = false) {
+async function callGeminiAPI(promptText, retryCount = 0) {
     const apiKey = getActiveKey();
     if (!apiKey) {
         alert("Thiếu API Key!");
@@ -381,9 +384,9 @@ async function callGeminiAPI(promptText, isRetry = false) {
 
             // Check for quota (429) or Leaked API Key (400)
             if (response.status === 429 || errorRaw.includes("leaked") || response.status === 400) {
-                if (!isRetry && rotateKey()) {
+                if (retryCount < _k.length && rotateKey()) {
                     console.log("Hết quota hoặc key lỗi, thử lại với key mới...");
-                    return await callGeminiAPI(promptText, true);
+                    return await callGeminiAPI(promptText, retryCount + 1);
                 } else {
                     throw new Error("Tất cả key dự phòng đều hết hạn mức hoặc lỗi.");
                 }
@@ -577,7 +580,7 @@ function appendChatLoading() {
     return id;
 }
 
-async function callChatGeminiAPI(fullHistory, isRetry = false) {
+async function callChatGeminiAPI(fullHistory, retryCount = 0) {
     const apiKey = getActiveKey();
     if (!apiKey) {
         alert("Thiếu API Key!");
@@ -637,9 +640,9 @@ async function callChatGeminiAPI(fullHistory, isRetry = false) {
             try { errorData = JSON.parse(errorRaw); } catch (e) { }
 
             if (response.status === 429 || errorRaw.includes("leaked") || response.status === 400) {
-                if (!isRetry && rotateKey()) {
+                if (retryCount < _k.length && rotateKey()) {
                     console.log("Hết quota hoặc key lỗi, thử lại chat với key mới...");
-                    return await callChatGeminiAPI(fullHistory, true);
+                    return await callChatGeminiAPI(fullHistory, retryCount + 1);
                 }
             }
             throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
