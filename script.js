@@ -516,8 +516,8 @@ async function handleChatSend() {
 
         if (symbolStr) {
             try {
-                // Fetch from Local Python Backend
-                const response = await fetch(`http://127.0.0.1:5000/api/trends?symbol=${symbolStr}&months=4`);
+                // Fetch from Local Python Backend / Vercel Serverless Route
+                const response = await fetch(`/api/trends?symbol=${symbolStr}&months=4`);
                 const trendsData = await response.json();
 
                 if (!response.ok || trendsData.error) {
