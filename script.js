@@ -19,13 +19,15 @@ const chatSendBtn = document.getElementById('chat-send-btn');
 let chatHistory = [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai một chuyên gia tư vấn chứng khoán chuyên nghiệp tại Việt Nam. Tên tôi là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn và súc tích." }],
+        parts: [{ text: "Hãy đóng vai một trợ lý AI phân tích chứng khoán chuyên nghiệp tại Việt Nam. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, logic và dễ hiểu." }],
     },
     {
         role: "model",
-        parts: [{ text: "Xin chào **Thưởng Vương Đức**! Chúc bạn một ngày đầu tư thành công. Tôi có thể giúp gì cho bạn hôm nay?" }]
+        parts: [{ text: "Đã hiểu." }]
     }
 ];
+
+let hasInitializedGreeting = false;
 // Dashboard Elements
 const refreshDashboardBtn = document.getElementById('refresh-dashboard-btn');
 const dashboardResult = document.getElementById('dashboard-result');
@@ -60,7 +62,11 @@ function init() {
         apiKeyModal.classList.add('hidden');
         appContainer.classList.remove('hidden');
         loadDashboard(); // Load dashboard cache if available
-        // Chat starts ready
+
+        if (!hasInitializedGreeting) {
+            initChatGreeting();
+            hasInitializedGreeting = true;
+        }
     }
 }
 
@@ -263,6 +269,64 @@ async function fetchMarketSnapshot() {
 
 // === Feature Implementations ===
 // === Chatbox Logic ===
+async function initChatGreeting() {
+    chatMessages.innerHTML = ''; // Clear board
+    const loadingId = appendChatLoading();
+
+    try {
+        const weatherRes = await fetch("https://api.open-meteo.com/v1/forecast?latitude=21.0245&longitude=105.8412&current_weather=true&hourly=temperature_2m,precipitation_probability&timezone=Asia%2FBangkok");
+        const weatherData = await weatherRes.json();
+
+        const temp = weatherData.current_weather.temperature;
+
+        const hourIndex = new Date().getHours();
+        const next4HoursTemps = weatherData.hourly.temperature_2m.slice(hourIndex, hourIndex + 4);
+        const next4HoursRain = weatherData.hourly.precipitation_probability.slice(hourIndex, hourIndex + 4);
+
+        const maxRainProb = Math.max(...next4HoursRain);
+        const willRain = maxRainProb > 30 ? `Có khả năng mưa (${maxRainProb}%)` : "Trời khô ráo, không mưa";
+
+        const now = new Date();
+        // Format time in GMT+7
+        const timeStr = now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
+        const dateStr = now.toLocaleDateString('vi-VN', { timeZone: 'Asia/Bangkok' });
+
+        const greetingPrompt = `Người dùng tên là Thưởng Vương Đức. 
+Hiện tại là ${timeStr} ngày ${dateStr} (GMT+7).
+Thời tiết ở Hà Nội hiện tại: ${temp}°C. ${willRain}.
+Dự báo 4h tới: Nhiệt độ khoảng ${next4HoursTemps.join(', ')} °C.
+
+Hãy viết MỘT câu chào mừng đóng vai Trợ lý Chứng khoán gửi cho người dùng. 
+Bao gồm đủ các ý sau nhưng viết GỌN GÀNG, TỰ NHIÊN, hiện đại (Markdown formatting):
+1. Chào Thưởng Vương Đức, báo giờ và ngày hiện tại (GMT+7).
+2. Tóm tắt thời tiết Hà Nội hiện tại: nhiệt độ, có mưa không, gợi ý mặc gì (ví dụ: áo ấm, áo khoác mỏng, mang ô che mưa...).
+3. Dự báo sơ bộ 4 tiếng tới.
+4. Lời chúc 1 ngày đầu tư thành công / giao dịch hiệu quả.
+5. Câu hỏi kết: Tôi có thể giúp gì cho bạn hôm nay?`;
+
+        const responseText = await callChatGeminiAPI([{ role: "user", parts: [{ text: greetingPrompt }] }]);
+
+        document.getElementById(loadingId)?.remove();
+
+        if (responseText) {
+            chatHistory.push({ role: "model", parts: [{ text: responseText }] });
+            appendChatMessage(responseText, 'bot');
+        } else {
+            fallbackGreeting();
+        }
+    } catch (e) {
+        console.error("Lỗi khởi tạo greeting:", e);
+        document.getElementById(loadingId)?.remove();
+        fallbackGreeting();
+    }
+}
+
+function fallbackGreeting() {
+    const text = "Xin chào **Thưởng Vương Đức**! Chúc bạn một ngày đầu tư thành công. Tôi có thể phân tích cổ phiếu hay vĩ mô gì cho bạn hôm nay?";
+    chatHistory.push({ role: "model", parts: [{ text }] });
+    appendChatMessage(text, 'bot');
+}
+
 async function handleChatSend() {
     const text = chatInput.value.trim();
     if (!text) return;
@@ -291,6 +355,13 @@ async function handleChatSend() {
 function appendChatMessage(text, sender) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}`;
+
+    // Add avatar label
+    const avatarLabel = document.createElement('div');
+    avatarLabel.className = 'message-avatar';
+    avatarLabel.innerText = sender === 'bot' ? 'Trợ lý AI' : 'Bạn';
+    msgDiv.appendChild(avatarLabel);
+
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content markdown-body';
 
@@ -310,10 +381,17 @@ function appendChatLoading() {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message bot`;
     msgDiv.id = id;
+
+    const avatarLabel = document.createElement('div');
+    avatarLabel.className = 'message-avatar';
+    avatarLabel.innerText = 'Trợ lý AI';
+    msgDiv.appendChild(avatarLabel);
+
     const contentDiv = document.createElement('div');
     contentDiv.className = 'message-content';
-    contentDiv.innerHTML = '<span class="skeleton-text">Đang suy nghĩ...</span>';
+    contentDiv.innerHTML = '<span class="skeleton-text">Đang lướt thị trường...</span>';
     msgDiv.appendChild(contentDiv);
+
     chatMessages.appendChild(msgDiv);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return id;
