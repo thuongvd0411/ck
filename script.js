@@ -51,11 +51,31 @@ const stockTickerSuggestions = document.getElementById('stock-ticker-suggestions
 
 
 // === State Management ===
-let GEMINI_API_KEY = localStorage.getItem('gemini_api_key') || 'AIzaSyAfhOHq6x-PGzqU7VCgOlXR1tXAsFw8-Wc';
+const DEFAULT_KEYS = [
+    'AIzaSyBeKlie0I7-ad6mmMle9UeEJ8P1TKvZ0Ws',
+    'AIzaSyC3KKbzOglKcZ6KEWyAS9pX-Ui8qIP5fNM',
+    'AIzaSyDuKKeUUbDp5RnONmqHM-clJk3T5ABkjEM',
+    'AIzaSyAfhOHq6x-PGzqU7VCgOlXR1tXAsFw8-Wc'
+];
+let currentKeyIndex = 0;
+let userApiKey = localStorage.getItem('gemini_api_key') || '';
+
+function getActiveKey() {
+    return userApiKey || DEFAULT_KEYS[currentKeyIndex];
+}
+
+function rotateKey() {
+    if (!userApiKey) {
+        currentKeyIndex = (currentKeyIndex + 1) % DEFAULT_KEYS.length;
+        console.log("Đổi sang API key dự phòng số " + (currentKeyIndex + 1));
+        return true;
+    }
+    return false;
+}
 
 // === Initialize App ===
-function init() {
-    if (!GEMINI_API_KEY) {
+function init(forceStart = false) {
+    if (!userApiKey && !forceStart) {
         apiKeyModal.classList.remove('hidden');
         appContainer.classList.add('hidden');
     } else {
@@ -73,10 +93,17 @@ function init() {
 // === Event Listeners ===
 
 // API Key Management
+const closeModalBtn = document.getElementById('close-modal-btn');
+if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+        init(true); // Ignore modal, use default keys
+    });
+}
+
 saveKeyBtn.addEventListener('click', () => {
     const key = apiKeyInput.value.trim();
     if (key) {
-        GEMINI_API_KEY = key;
+        userApiKey = key;
         localStorage.setItem('gemini_api_key', key);
         init();
     } else {
@@ -85,10 +112,10 @@ saveKeyBtn.addEventListener('click', () => {
 });
 
 changeKeyBtn.addEventListener('click', () => {
-    apiKeyInput.value = GEMINI_API_KEY; // Pre-fill
+    apiKeyInput.value = userApiKey; // Pre-fill
     localStorage.removeItem('gemini_api_key');
-    GEMINI_API_KEY = '';
-    init();
+    userApiKey = '';
+    init(); // show modal again
 });
 
 // Navigation (Tabs)
@@ -201,8 +228,9 @@ stockInput.addEventListener('keypress', (e) => {
 
 
 // === Core Gemini API Function ===
-async function callGeminiAPI(promptText) {
-    if (!GEMINI_API_KEY) {
+async function callGeminiAPI(promptText, isRetry = false) {
+    const apiKey = getActiveKey();
+    if (!apiKey) {
         alert("Thiếu API Key!");
         init();
         return null;
@@ -210,7 +238,7 @@ async function callGeminiAPI(promptText) {
 
     showLoading(true);
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(API_URL, {
@@ -229,6 +257,14 @@ async function callGeminiAPI(promptText) {
         });
 
         if (!response.ok) {
+            if (response.status === 429) {
+                if (!isRetry && rotateKey()) {
+                    console.log("Hết quota, thử lại với key mới...");
+                    return await callGeminiAPI(promptText, true);
+                } else {
+                    throw new Error("Tất cả key dự phòng đều hết hạn mức hoặc lỗi truy cập.");
+                }
+            }
             const errorData = await response.json();
             throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
         }
@@ -397,14 +433,15 @@ function appendChatLoading() {
     return id;
 }
 
-async function callChatGeminiAPI(history) {
-    if (!GEMINI_API_KEY) {
+async function callChatGeminiAPI(history, isRetry = false) {
+    const apiKey = getActiveKey();
+    if (!apiKey) {
         alert("Thiếu API Key!");
         init();
         return null;
     }
 
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     try {
         const response = await fetch(API_URL, {
@@ -419,6 +456,12 @@ async function callChatGeminiAPI(history) {
         });
 
         if (!response.ok) {
+            if (response.status === 429) {
+                if (!isRetry && rotateKey()) {
+                    console.log("Hết quota, thử lại chat với key mới...");
+                    return await callChatGeminiAPI(history, true);
+                }
+            }
             const errorData = await response.json();
             throw new Error(errorData.error?.message || "Lỗi khi gọi Gemini API");
         }
