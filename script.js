@@ -30,11 +30,11 @@ const clearProfileBtn = document.getElementById('clear-profile-btn');
 let chatHistory = JSON.parse(localStorage.getItem('ai_stock_chat_history')) || [
     {
         role: "user",
-        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
+        parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam.\n\nĐẶC BIỆT KHI NGƯỜI DÙNG YÊU CẦU PHÂN TÍCH VỀ 1 MÃ CỔ PHIẾU/TÀI SẢN BẤT KỲ, BẠN BẮT BUỘC PHẢI DÙNG FORMAT PHÂN TÍCH SWING 1-3 THÁNG NHƯ SAU (BẮT BUỘC CHỈ IN RA ĐÚNG CẤU TRÚC NÀY, BỎ QUA LỜI CHÀO HỎI, KHÔNG BAO BỌC TRONG CODE BLOCK. LƯU Ý KHI TRẢ LỜI CÁC GẠCH ĐẦU DÒNG, HÃY ĐIỀN TRỰC TIẾP GIÁ TRỊ VÀO, KHÔNG TRẢ LỜI KIỂU MÁY MÓC NHẮC LẠI CÂU HỎI. VÍ DỤ: '- Đầu tư công, BĐS KCN' thay vì '- Thường chạy theo sóng gì (đầu cơ, đầu tư công...): Đầu tư công, BĐS KCN'):\n\n--------------------------------------------------\n**[TÊN MÃ CỔ PHIẾU]**\n--------------------------------------------------\n\n🔎 Thuộc nhóm:\n- Ngành chính:\n- Hưởng lợi từ câu chuyện nào:\n- Có tính chu kỳ hay phòng thủ:\n\n🎯 Đặc điểm cổ phiếu:\n- Largecap / Midcap / Penny:\n- Beta cao hay thấp:\n- Thường chạy theo sóng gì:\n- Mức độ biến động:\n\n📊 Về kỹ thuật (đặc tính lịch sử):\n- Có hay tạo nền tích lũy dài không:\n- Thường breakout kiểu nào:\n- Có hay bull trap không:\n- Phù hợp đánh breakout hay đánh nền:\n\n🧠 Đánh giá 1–3 tháng:\n✔ Có thể chạy nếu:\n- (Liệt kê điều kiện cụ thể)\n\n❗ Rủi ro:\n- (Liệt kê rủi ro thực tế, không chung chung)\n\n📈 Phong cách phù hợp:\n- Swing 1–3 tháng / Trading ngắn / Giữ trung hạn:\n- Phù hợp người chịu rủi ro cao hay thấp:\n\n⚖ Kết luận xác suất:\n- Đánh giá tiềm năng 1–5:\n- Giải thích logic vì sao chấm điểm đó:\n--------------------------------------------------\n\nKHI NGƯỜI DÙNG YÊU CẦU SO SÁNH 2 HAY NHIỀU MÃ CỔ PHIẾU BẤT KỲ, BẠN BẮT BUỘC TRẢ LỜI ĐÚNG THEO MẪU SAU (TRÌNH BÀY DƯỚI DẠNG BẢNG MARKDOWN DỄ NHÌN, THAY [Mã] BẰNG MÃ CỔ PHIẾU TƯƠNG ỨNG):\n\n📊 So sánh nhanh\n\n| Tiêu chí | [Mã 1] | [Mã 2] |\n|---|---|---|\n| Nhóm ngành |  |  |\n| Độ rủi ro |  |  |\n| Tính đầu cơ |  |  |\n| Khả năng chạy sóng |  |  |\n| Phù hợp ai |  |  |\n\n🎯 Kết luận thẳng:\n- Nếu muốn đánh nhanh – biên lớn ➔ [Mã]\n- Nếu muốn cân bằng rủi ro ➔ [Mã]\n- Nêu tuỳ chọn nhận định tuỳ thuộc vào câu hỏi (Ví dụ: Nếu so với PC1/PVS ➔ VCG an toàn hơn, FCN rủi ro hơn)\n\nLưu ý: Nếu giá > 60.000 VND thì thông báo cảnh báo không phù hợp tiêu chí lọc giá." }],
     },
     {
         role: "model",
-        parts: [{ text: "Đã hiểu." }]
+        parts: [{ text: "Đã hiểu, tôi sẽ BẤT DI BẤT DỊCH tuân thủ chính xác format trên khi được yêu cầu phân tích." }]
     }
 ];
 
@@ -220,11 +220,11 @@ clearChatBtn.addEventListener('click', () => {
         chatHistory = [
             {
                 role: "user",
-                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam. Bạn phân tích khách quan, logic. Không đưa khuyến nghị mua bán chắc chắn. Chấm điểm cổ phiếu theo thang 100 điểm. Điều chỉnh phân tích phù hợp với mức chấp nhận rủi ro của người dùng. Tên người dùng là Thưởng Vương Đức. Trả lời các câu hỏi ngắn gọn, súc tích, dễ hiểu." }],
+                parts: [{ text: "Hãy đóng vai AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam.\n\nĐẶC BIỆT KHI NGƯỜI DÙNG YÊU CẦU PHÂN TÍCH VỀ 1 MÃ CỔ PHIẾU/TÀI SẢN BẤT KỲ, BẠN BẮT BUỘC PHẢI DÙNG FORMAT PHÂN TÍCH SWING 1-3 THÁNG NHƯ SAU (BẮT BUỘC CHỈ IN RA ĐÚNG CẤU TRÚC NÀY, BỎ QUA LỜI CHÀO HỎI, KHÔNG BAO BỌC TRONG CODE BLOCK. LƯU Ý KHI TRẢ LỜI CÁC GẠCH ĐẦU DÒNG, HÃY ĐIỀN TRỰC TIẾP GIÁ TRỊ VÀO, KHÔNG TRẢ LỜI KIỂU MÁY MÓC NHẮC LẠI CÂU HỎI. VÍ DỤ: '- Đầu tư công, BĐS KCN' thay vì '- Thường chạy theo sóng gì (đầu cơ, đầu tư công...): Đầu tư công, BĐS KCN'):\n\n--------------------------------------------------\n**[TÊN MÃ CỔ PHIẾU]**\n--------------------------------------------------\n\n🔎 Thuộc nhóm:\n- Ngành chính:\n- Hưởng lợi từ câu chuyện nào:\n- Có tính chu kỳ hay phòng thủ:\n\n🎯 Đặc điểm cổ phiếu:\n- Largecap / Midcap / Penny:\n- Beta cao hay thấp:\n- Thường chạy theo sóng gì:\n- Mức độ biến động:\n\n📊 Về kỹ thuật (đặc tính lịch sử):\n- Có hay tạo nền tích lũy dài không:\n- Thường breakout kiểu nào:\n- Có hay bull trap không:\n- Phù hợp đánh breakout hay đánh nền:\n\n🧠 Đánh giá 1–3 tháng:\n✔ Có thể chạy nếu:\n- (Liệt kê điều kiện cụ thể)\n\n❗ Rủi ro:\n- (Liệt kê rủi ro thực tế, không chung chung)\n\n📈 Phong cách phù hợp:\n- Swing 1–3 tháng / Trading ngắn / Giữ trung hạn:\n- Phù hợp người chịu rủi ro cao hay thấp:\n\n⚖ Kết luận xác suất:\n- Đánh giá tiềm năng 1–5:\n- Giải thích logic vì sao chấm điểm đó:\n--------------------------------------------------\n\nKHI NGƯỜI DÙNG YÊU CẦU SO SÁNH 2 HAY NHIỀU MÃ CỔ PHIẾU BẤT KỲ, BẠN BẮT BUỘC TRẢ LỜI ĐÚNG THEO MẪU SAU (TRÌNH BÀY DƯỚI DẠNG BẢNG MARKDOWN DỄ NHÌN, THAY [Mã] BẰNG MÃ CỔ PHIẾU TƯƠNG ỨNG):\n\n📊 So sánh nhanh\n\n| Tiêu chí | [Mã 1] | [Mã 2] |\n|---|---|---|\n| Nhóm ngành |  |  |\n| Độ rủi ro |  |  |\n| Tính đầu cơ |  |  |\n| Khả năng chạy sóng |  |  |\n| Phù hợp ai |  |  |\n\n🎯 Kết luận thẳng:\n- Nếu muốn đánh nhanh – biên lớn ➔ [Mã]\n- Nếu muốn cân bằng rủi ro ➔ [Mã]\n- Nêu tuỳ chọn nhận định tuỳ thuộc vào câu hỏi (Ví dụ: Nếu so với PC1/PVS ➔ VCG an toàn hơn, FCN rủi ro hơn)\n\nLưu ý: Nếu giá > 60.000 VND thì thông báo cảnh báo không phù hợp tiêu chí lọc giá." }],
             },
             {
                 role: "model",
-                parts: [{ text: "Đã hiểu." }]
+                parts: [{ text: "Đã hiểu, tôi sẽ BẤT DI BẤT DỊCH tuân thủ chính xác format trên khi được yêu cầu phân tích." }]
             }
         ];
         localStorage.removeItem('ai_stock_chat_history');
@@ -441,47 +441,84 @@ async function fetchMarketSnapshot() {
 }
 
 // === Feature Implementations ===
-// === Chatbox Logic ===
 async function initChatGreeting() {
     chatMessages.innerHTML = ''; // Clear board
     const loadingId = appendChatLoading();
 
     try {
-        const weatherRes = await fetch("https://api.open-meteo.com/v1/forecast?latitude=21.0245&longitude=105.8412&current_weather=true&hourly=temperature_2m,precipitation_probability&timezone=Asia%2FBangkok");
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('vi-VN');
+        const currentHour = now.getHours();
+
+        let sessionName = "buổi sáng";
+        let sessionKey = "morning";
+        if (currentHour >= 12 && currentHour < 14) {
+            sessionName = "buổi trưa";
+            sessionKey = "noon";
+        }
+        else if (currentHour >= 14 && currentHour < 18) {
+            sessionName = "buổi chiều";
+            sessionKey = "afternoon";
+        }
+        else if (currentHour >= 18) {
+            sessionName = "buổi tối";
+            sessionKey = "evening";
+        }
+
+        const cacheKey = `chat_greeting_${dateStr}_${sessionKey}`;
+        const cachedGreeting = localStorage.getItem(cacheKey);
+
+        if (cachedGreeting) {
+            document.getElementById(loadingId)?.remove();
+            appendChatMessage(cachedGreeting, 'bot');
+            return;
+        }
+
+        const weatherRes = await fetch("https://api.open-meteo.com/v1/forecast?latitude=21.0116&longitude=105.8529&current_weather=true&hourly=temperature_2m,precipitation_probability&timezone=Asia%2FBangkok");
         const weatherData = await weatherRes.json();
 
         const temp = weatherData.current_weather.temperature;
 
-        const hourIndex = new Date().getHours();
-        const next4HoursTemps = weatherData.hourly.temperature_2m.slice(hourIndex, hourIndex + 4);
-        const next4HoursRain = weatherData.hourly.precipitation_probability.slice(hourIndex, hourIndex + 4);
+        const hourIndex = now.getHours();
 
-        const maxRainProb = Math.max(...next4HoursRain);
-        const willRain = maxRainProb > 30 ? `Có khả năng mưa (${maxRainProb}%)` : "Trời khô ráo, không mưa";
+        let weatherStr = "";
+        if (currentHour >= 18) {
+            // Predict for next morning (approx +14 hours from 18h is 8h next morning)
+            const targetMorningIndex = hourIndex + (24 - hourIndex) + 8; // 8 AM next day
+            if (targetMorningIndex < weatherData.hourly.temperature_2m.length) {
+                const nextMorningTemp = weatherData.hourly.temperature_2m[targetMorningIndex];
+                const nextMorningRain = weatherData.hourly.precipitation_probability[targetMorningIndex];
+                const willRainMorning = nextMorningRain > 30 ? `có khả năng mưa (${nextMorningRain}%)` : "trời sẽ khô ráo";
+                weatherStr = `Dự báo sáng mai: Nhiệt độ khoảng ${Math.round(nextMorningTemp)}°C, ${willRainMorning}.`;
+            } else {
+                weatherStr = "Dự báo ngày mai: Chưa có dữ liệu thời tiết.";
+            }
+        } else {
+            // Predict for next 4 hours
+            const next4HoursTemps = weatherData.hourly.temperature_2m.slice(hourIndex, hourIndex + 4);
+            const next4HoursRain = weatherData.hourly.precipitation_probability.slice(hourIndex, hourIndex + 4);
+            const maxRainProb = Math.max(...next4HoursRain);
+            const willRain = maxRainProb > 30 ? `Có khả năng mưa (${maxRainProb}%)` : "Trời khô ráo, không mưa";
+            weatherStr = `Dự báo 4h tới: Nhiệt độ khoảng ${Math.round(next4HoursTemps.reduce((a, b) => a + b) / next4HoursTemps.length)}°C. ${willRain}.`;
+        }
 
-        const now = new Date();
         const timeStr = now.toLocaleTimeString('vi-VN', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
-        const currentHour = now.getHours();
-
-        let sessionName = "buổi sáng";
-        if (currentHour >= 12 && currentHour < 14) sessionName = "buổi trưa";
-        else if (currentHour >= 14 && currentHour < 18) sessionName = "buổi chiều";
-        else if (currentHour >= 18) sessionName = "buổi tối";
 
         const greetingPrompt = `Người dùng tên là Thưởng Vương Đức.
 Tình huống: Người dùng vừa mở ứng dụng AI Chứng Khoán.
 Thời gian hiện tại: ${sessionName}, ${timeStr}.
-Nhiệt độ Hà Nội hiện tại: ${temp}°C. ${willRain}.
-Dự báo 4h tới: Nhiệt độ khoảng ${Math.round(next4HoursTemps.reduce((a, b) => a + b) / next4HoursTemps.length)}°C.
+Nhiệt độ Hai Bà Trưng, Hà Nội hiện tại: ${temp}°C.
+${weatherStr}
 
-Hãy viết ĐÚNG 1 CÂU chào mừng tham khảo cấu trúc ví dụ dưới đây (chỉ thay đổi thời gian buổi nào, giờ, nhiệt độ, thời tiết cho đúng với hiện tại. Viết tự nhiên, súc tích, KHÔNG THÊM BẤT KỲ câu hỏi nào ở cuối.):
-Ví dụ: "Xin chào buổi trưa anh **Thưởng Vương Đức**, giờ là 13h, Hà Nội hiện có nhiệt độ 21 độ C, anh có thể mặc áo khoác mỏng và tận hưởng không khí mát mẻ. Dự kiến 4h tới không mưa, nhiệt độ là 23 độ C. chúc anh 1 ngày đầu tư thành công."`;
+Hãy viết ĐÚNG 1 CÂU chào mừng tham khảo cấu trúc ví dụ dưới đây (chỉ thay đổi thời gian buổi nào, nhiệt độ, thời tiết cho đúng với hiện tại. KHÔNG ĐƯA THÔNG TIN GIỜ CHÍNH XÁC VÀO CÂU CHÀO. Viết tự nhiên, súc tích, KHÔNG THÊM BẤT KỲ câu hỏi nào ở cuối.):
+Ví dụ: "Xin chào buổi trưa anh **Thưởng Vương Đức**, khu vực Hai Bà Trưng hiện có nhiệt độ 21 độ C, thời tiết khá dễ chịu. Dự kiến 4h tới trời khô ráo không mưa, nhiệt độ là 23 độ C. Chúc anh 1 ngày đầu tư thành công."`;
 
         const responseText = await callChatGeminiAPI([{ role: "user", parts: [{ text: greetingPrompt }] }]);
 
         document.getElementById(loadingId)?.remove();
 
         if (responseText) {
+            localStorage.setItem(cacheKey, responseText);
             appendChatMessage(responseText, 'bot');
         } else {
             fallbackGreeting();
@@ -680,10 +717,7 @@ async function loadDashboard() {
     if (cachedReport) {
         dashboardResult.innerHTML = marked.parse(cachedReport);
     } else {
-        // Optional: Auto fetch on first load of the day, or wait for user click. 
-        // We will wait for user click to save API calls, but the prompt asked: "Kiểm tra localStorage có macro_report_YYYY-MM-DD chưa. Nếu có → hiển thị. Nếu chưa → fetch 5–10 tin tức + snapshot thị trường rồi gửi Gemini."
-        // We will auto generate if not cached.
-        generateDashboardReport(false);
+        dashboardResult.innerHTML = '<p class="empty-state">Vui lòng nhấn nút "Phân tích" để AI tổng hợp thông tin vĩ mô hôm nay.</p>';
     }
 }
 
@@ -883,22 +917,66 @@ Phân tích logic, không cảm tính.`;
 
 async function analyzeStock(ticker) {
     const profileText = getProfileSummary();
-    const prompt = `Bạn là AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam.
-Người dùng đang yêu cầu ĐÁNH GIÁ & CHẤM ĐIỂM cổ phiếu: ${ticker}.
+    const prompt = `Bạn là một trader có kinh nghiệm đang đánh giá nhanh cổ phiếu cho chiến lược swing 1–3 tháng, tập trung vào tính chất vận động và xác suất. Áp dụng cho cả phân tích Vàng, Bạc, dầu khí hay bất kì mã nào của thế giới.
 
+Người dùng đang cần phân tích mã cổ phiếu/tài sản: ${ticker}.
 THÔNG TIN NHÀ ĐẦU TƯ:
 ${profileText}
 
-YÊU CẦU PHÂN TÍCH (trình bày bằng Markdown dễ nhìn):
-1. Tóm tắt doanh nghiệp (cực kỳ ngắn gọn).
-2. Phân tích cơ bản & Tài chính hiện tại.
-3. Phân tích triển vọng ngành.
-4. Đánh giá định giá (Rẻ, Hợp lý hay Đắt).
-5. CHẤM ĐIỂM CỔ PHIẾU: Đưa ra điểm số khách quan trên thang 100 điểm. Hãy in đậm dòng này (Ví dụ: **Điểm đánh giá tổng thể: 75/100**).
-6. NHẬN ĐỊNH SỰ PHÙ HỢP: Dựa vào hồ sơ nhà đầu tư (mức rủi ro, thời gian, phong cách), hãy đưa ra lời khuyên cụ thể.
-NẾU cổ phiếu có rủi ro cao (hoặc tính đầu cơ mạnh) mà nhà đầu tư thuộc nhóm an toàn/rủi ro thấp, BẮT BUỘC có dòng CẢNH BÁO in đậm chặn đầu.
+==================================================
+YÊU CẦU FORMAT BẮT BUỘC, BẤT DI BẤT DỊCH
+==================================================
 
-Tính khách quan, logic, không hô hào.`;
+Khi người dùng nhập mã cổ phiếu, GPT phải trả lời đúng cấu trúc sau (trình bày bằng Markdown. BỎ QUA MỌI LỜI CHÀO HỎI ở đầu. KHÔNG TỰ BIÊN TẬP HAY ĐỔI TÊN MỤC. LƯU Ý KHI TRẢ LỜI CÁC GẠCH ĐẦU DÒNG, HÃY ĐIỀN TRỰC TIẾP GIÁ TRỊ VÀO, KHÔNG TRẢ LỜI KIỂU MÁY MÓC NHẮC LẠI CÂU HỎI. VÍ DỤ: '- Đầu tư công, BĐS KCN' thay vì '- Thường chạy theo sóng gì (đầu cơ, đầu tư công...): Đầu tư công, BĐS KCN'):
+
+--------------------------------------------------
+**[${ticker}]**
+--------------------------------------------------
+
+🔎 Thuộc nhóm:
+- Ngành chính:
+- Hưởng lợi từ câu chuyện nào:
+- Có tính chu kỳ hay phòng thủ:
+
+🎯 Đặc điểm cổ phiếu:
+- Largecap / Midcap / Penny:
+- Beta cao hay thấp:
+- Thường chạy theo sóng gì:
+- Mức độ biến động:
+
+📊 Về kỹ thuật (đặc tính lịch sử):
+- Có hay tạo nền tích lũy dài không:
+- Thường breakout kiểu nào:
+- Có hay bull trap không:
+- Phù hợp đánh breakout hay đánh nền:
+
+🧠 Đánh giá 1–3 tháng:
+✔ Có thể chạy nếu:
+- (Liệt kê điều kiện cụ thể)
+
+❗ Rủi ro:
+- (Liệt kê rủi ro thực tế, không chung chung)
+
+📈 Phong cách phù hợp:
+- Swing 1–3 tháng / Trading ngắn / Giữ trung hạn:
+- Phù hợp người chịu rủi ro cao hay thấp:
+
+⚖ Kết luận xác suất:
+- Đánh giá tiềm năng 1–5:
+- Giải thích logic vì sao chấm điểm đó:
+
+--------------------------------------------------
+
+==================================================
+YÊU CẦU PHONG CÁCH
+==================================================
+
+- Phân tích thực tế, không PR.
+- Không khuyến nghị mua/bán cụ thể.
+- Không dùng văn phong chung chung kiểu "có tiềm năng tăng trưởng".
+- Phải có lập luận rõ ràng.
+- Nếu thiếu dữ liệu giá hiện tại thì không giả định bừa.
+- Nếu giá > 60.000 VND thì cảnh báo không phù hợp tiêu chí lọc giá.`;
 
     const resultMarkdown = await callGeminiAPI(prompt);
 
@@ -910,21 +988,32 @@ Tính khách quan, logic, không hô hào.`;
 
 async function analyzeCompare(ticker1, ticker2) {
     const profileText = getProfileSummary();
-    const prompt = `Bạn là AI Trợ Lý Đầu Tư Cá Nhân chuyên phân tích chứng khoán Việt Nam.
+    const prompt = `Bạn là một trader có kinh nghiệm đang đánh giá nhanh các cổ phiếu cho chiến lược swing 1–3 tháng.
 Người dùng đang yêu cầu SO SÁNH 2 cổ phiếu: ${ticker1} và ${ticker2}.
 
 THÔNG TIN NHÀ ĐẦU TƯ:
 ${profileText}
 
-YÊU CẦU KẾT QUẢ (sử dụng Markdown Format):
-Hãy tạo một Bảng so sánh (Markdown Table) chi tiết giữa 2 cổ phiếu về các tiêu chí: 
-- Tăng trưởng
-- Hiệu quả hoạt động
-- Sức khỏe tài chính
-- Tình trạng định giá
-- Điểm tổng (Chấm trên thang 10 điểm hoặc 100 điểm cho mỗi mã)
+==================================================
+YÊU CẦU FORMAT BẮT BUỘC, BẤT DI BẤT DỊCH
+==================================================
 
-Sau bảng so sánh, hãy viết một đoạn "Đánh giá phù hợp với hồ sơ của bạn". Gợi ý cho người dùng xem mã nào (hoặc không mã nào) phù hợp hơn với sở thích, mức rủi ro và thời gian đầu tư của họ. Khách quan và logic.`;
+Khi người dùng yêu cầu so sánh mã cổ phiếu, GPT phải trả lời đúng cấu trúc sau (trình bày bằng Markdown. BỎ QUA MỌI LỜI CHÀO HỎI ở đầu. KHÔNG TỰ BIÊN TẬP HAY ĐỔI TÊN MỤC):
+
+📊 So sánh nhanh
+
+| Tiêu chí | ${ticker1} | ${ticker2} |
+|---|---|---|
+| Nhóm ngành | | |
+| Độ rủi ro | | |
+| Tính đầu cơ | | |
+| Khả năng chạy sóng | | |
+| Phù hợp ai | | |
+
+🎯 Kết luận thẳng:
+- Nếu muốn đánh nhanh – biên lớn ➔ [Mã cổ phiếu phù hợp]
+- Nếu muốn cân bằng rủi ro ➔ [Mã cổ phiếu phù hợp]
+- Nếu so với các mã cùng ngành khác ➔ [Tùy chọn nhận định thêm]`;
 
     const resultMarkdown = await callGeminiAPI(prompt);
 
