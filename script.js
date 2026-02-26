@@ -651,7 +651,7 @@ function appendChatMessage(text, sender) {
     // Add avatar label
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = sender === 'bot' ? 'HOAN VU' : 'Bạn';
+    avatarLabel.innerText = sender === 'bot' ? '[AI_RSP] >' : '[USR_CMD] ~';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');
@@ -677,7 +677,7 @@ function appendChatLoading() {
 
     const avatarLabel = document.createElement('div');
     avatarLabel.className = 'message-avatar';
-    avatarLabel.innerText = 'HOAN VU';
+    avatarLabel.innerText = '[AI_RSP] >';
     msgDiv.appendChild(avatarLabel);
 
     const contentDiv = document.createElement('div');

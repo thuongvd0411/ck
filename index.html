@@ -37,15 +37,15 @@
     <div id="app-container" class="hidden">
         <header class="glass-header">
             <div class="logo">
-                <span class="gradient-text">AI Trợ Lý Đầu Tư Cá Nhân</span>
+                <span class="gradient-text">NEURAL_TRADE_ v1.0</span>
             </div>
             <nav id="main-nav">
-                <button class="nav-btn active" data-target="welcome-tab">Chatbox</button>
-                <button class="nav-btn" data-target="analysis-tab">Phân tích Cá nhân</button>
-                <button class="nav-btn" data-target="news-tab">Tin tức</button>
-                <button class="nav-btn" data-target="dashboard-tab">Vĩ mô</button>
+                <button class="nav-btn active" data-target="welcome-tab">[>] TERMINAL</button>
+                <button class="nav-btn" data-target="analysis-tab">[$] PORTFOLIO</button>
+                <button class="nav-btn" data-target="news-tab">[!] NEWS_FEED</button>
+                <button class="nav-btn" data-target="dashboard-tab">[*] MACRO_DATA</button>
             </nav>
-            <button id="change-key-btn" class="secondary-btn">Đổi API Key</button>
+            <button id="change-key-btn" class="secondary-btn">[CONFIG] API_KEY</button>
         </header>
 
         <main class="content-wrapper">
@@ -59,44 +59,29 @@
             <section id="welcome-tab" class="tab-content active">
                 <div class="cyber-container">
                     <div class="cyber-header">
-                        <div class="cyber-title"><span class="icon">⚡</span> AI CHATBOT</div>
+                        <div class="status-indicator">
+                            <div class="pulse-dot"></div>
+                            <span>TERMINAL STATUS: [ONLINE]</span>
+                            <span style="margin-left: 20px;">ENC: AES-256</span>
+                            <span style="margin-left: 20px;">NODE: SECURE</span>
+                        </div>
                         <div class="cyber-controls">
-                            <button id="load-history-btn" class="cyber-btn-small hidden">Lịch sử</button>
-                            <button id="clear-chat-btn" class="cyber-btn-small">Xóa Log</button>
+                            <button id="load-history-btn" class="cyber-btn-small hidden">RECOVER LOGS</button>
+                            <button id="clear-chat-btn" class="cyber-btn-small">PURGE CACHE</button>
                         </div>
                     </div>
 
                     <div class="cyber-layout">
-                        <!-- Left Column: Holographic Avatar -->
-                        <div class="cyber-avatar-panel">
-                            <div class="avatar-frame">
-                                <img src="assets/avatar.png" alt="HOAN VU Hologram" class="hologram-img">
-                                <div class="scanline"></div>
-                            </div>
-                            <div class="avatar-info">
-                                <div class="avatar-name">HOAN VU:</div>
-                                <div class="avatar-subname">Advanced Universal<br>Response Agent</div>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: Chat Interface -->
+                        <!-- Main Terminal Panel -->
                         <div class="cyber-chat-panel">
                             <div class="chat-messages" id="chat-messages">
                                 <!-- Messages go here -->
                             </div>
 
-                            <!-- Graph Decoration (Static mockup based on reference) -->
-                            <div class="cyber-graph-deco">
-                                <div class="graph-box"></div>
-                            </div>
 
                             <div class="cyber-input-area">
-                                <div class="waveform-deco">
-                                    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-                                </div>
                                 <div class="input-glow-wrapper">
-                                    <textarea id="chat-input"
-                                        placeholder="Initiate sequence... (Enter to send, Shift+Enter for new line)"></textarea>
+                                    <textarea id="chat-input" placeholder="Enter command..."></textarea>
                                     <button id="chat-send-btn" class="cyber-send-btn">
                                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
